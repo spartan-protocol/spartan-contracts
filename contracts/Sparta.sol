@@ -2,16 +2,13 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.3;
 import "./iBEP20.sol";
-import "./iDAO.sol";
-import "./iBASEv1.sol"; 
-import "./iUTILS.sol";
-import "./iBEP677.sol"; 
+import "./iHANDLER.sol";
 
     //======================================SPARTA=========================================//
-contract Sparta is iBEP20 {
+contract Sparta is IBEP20 {
 
     // BEP-20 Parameters
-    string public constant override name = 'Spartan Protocol Token V2';
+    string public constant override name = 'Spartan Protocol Token V3';
     string public constant override symbol = 'SPARTA';
     uint8 public constant override decimals = 18;
     uint256 public override totalSupply;
@@ -21,11 +18,8 @@ contract Sparta is iBEP20 {
     mapping(address => mapping(address => uint256)) private _allowances;
 
     // Parameters
-    bool public emitting;
     bool public minting;
-    bool private savedSpartans;
-    uint256 public feeOnTransfer;
-    
+    bool public emitting;    
     uint256 public emissionCurve;
     uint256 private _100m;
     uint256 public maxSupply;
@@ -33,25 +27,25 @@ contract Sparta is iBEP20 {
     uint256 public secondsPerEra;
     uint256 public nextEraTime;
 
-    address public DAO;
     address public DEPLOYER;
-    address public BASEv1;
+    address public BASEv2;
+    address public HANDLER;
 
     event NewEra(uint256 nextEraTime, uint256 emission);
 
     // Only DAO can execute
-    modifier onlyDAO() {
-        require(msg.sender == DAO || msg.sender == DEPLOYER, "!DAO");
+    modifier onlyDEPLOYER() {
+        require(msg.sender == DEPLOYER, "!DEPLOYER");
         _;
     }
 
     //=====================================CREATION=========================================//
     // Constructor
-    constructor(address _baseV1) {
+    constructor(address _baseV2) {
         _100m = 100 * 10**6 * 10**decimals; // 100m
         maxSupply = 300 * 10**6 * 10**decimals; // 300m
         emissionCurve = 2048;
-        BASEv1 = _baseV1;
+        BASEv2 = _baseV2;
         secondsPerEra =  86400; // 1 day
         nextEraTime = block.timestamp + secondsPerEra;
         DEPLOYER = msg.sender;
@@ -109,32 +103,12 @@ contract Sparta is iBEP20 {
         return true;
     }
 
-    //iBEP677 approveAndCall
-    function approveAndCall(address recipient, uint amount, bytes calldata data) external returns (bool) {
-      _approve(msg.sender, recipient, type(uint256).max); // Give recipient max approval
-      iBEP677(recipient).onTokenApproval(address(this), amount, msg.sender, data); // Amount is passed thru to recipient
-      return true;
-     }
-
-      //iBEP677 transferAndCall
-    function transferAndCall(address recipient, uint amount, bytes calldata data) external returns (bool) {
-      _transfer(msg.sender, recipient, amount);
-      iBEP677(recipient).onTokenTransfer(address(this), amount, msg.sender, data); // Amount is passed thru to recipient 
-      return true;
-     }
-
-
     // Internal transfer function
     function _transfer(address sender, address recipient, uint256 amount) internal virtual {
         require(sender != address(0), "transfer err");
         require(recipient != address(this), "recipient"); // Don't allow transfers here
         uint256 senderBalance = _balances[sender];
         require(senderBalance >= amount, "balance err");
-        uint _fee = iUTILS(UTILS()).calcPart(feeOnTransfer, amount);   // Critical functionality                                                      
-        if(_fee <= amount){                // Stops reverts if UTILS corrupted           
-            amount -= _fee;
-            _burn(sender, _fee);
-        }
         _balances[sender] -= amount;
         _balances[recipient] += amount;
         emit Transfer(sender, recipient, amount);
@@ -169,35 +143,30 @@ contract Sparta is iBEP20 {
 
     //=========================================DAO=========================================//
     // Can start
-    function flipEmissions() external onlyDAO {
+    function flipEmissions() external onlyDEPLOYER {
         emitting = !emitting;
     }
      // Can stop
-    function flipMinting() external onlyDAO {
+    function flipMinting() external onlyDEPLOYER {
         minting = !minting;
     }
     // Can set params
-    function setParams(uint256 newTime, uint256 newCurve) external onlyDAO {
+    function setParams(uint256 newTime, uint256 newCurve) external onlyDEPLOYER {
         secondsPerEra = newTime;
         emissionCurve = newCurve;
     }
-    function saveFallenSpartans(address _savedSpartans, uint256 _saveAmount) external onlyDAO{
-        require(!savedSpartans, 'spartans saved'); // only one time
-        savedSpartans = true;
-        _mint(_savedSpartans, _saveAmount);
-    }
-    // Can change DAO
-    function changeDAO(address newDAO) external onlyDAO {
-        require(newDAO != address(0), "address err");
-        DAO = newDAO;
-    }
-    // Can purge DAO
-    function purgeDAO() external onlyDAO {
-        DAO = address(0);
+    // Can change HANDLER
+    function changeHANDLER(address newHANDLER) external onlyDEPLOYER {
+        require(newHANDLER != address(0), "address err");
+        HANDLER = newHANDLER;
     }
     // Can purge DEPLOYER
-    function purgeDeployer() public onlyDAO {
+    function purgeDeployer() public onlyDEPLOYER {
         DEPLOYER = address(0);
+    }
+     // Can purge HANDLER
+    function purgeHANDLER() external onlyDEPLOYER {
+        HANDLER = address(0);
     }
 
    //======================================EMISSION========================================//
@@ -207,10 +176,6 @@ contract Sparta is iBEP20 {
             nextEraTime = block.timestamp + secondsPerEra; // Set next Era time
             uint256 _emission = getDailyEmission(); // Get Daily Dmission
             _mint(RESERVE(), _emission); // Mint to the RESERVE Address
-            feeOnTransfer = iUTILS(UTILS()).getFeeOnTransfer(totalSupply, maxSupply); 
-            if (feeOnTransfer > 500) { // Ensure utils isn't ever rogue
-                feeOnTransfer = 500; // Max 5% FoT
-            } 
             emit NewEra(nextEraTime, _emission); // Emit Event
         }
     }
@@ -226,27 +191,19 @@ contract Sparta is iBEP20 {
     }
 
     //==========================================Minting============================================//
-    function upgrade() external {
-        uint amount = iBEP20(BASEv1).balanceOf(msg.sender); //Get balance of sender
-        require(iBASEv1(BASEv1).transferTo(address(this), amount)); //Transfer balance from sender
-        iBEP20(BASEv1).burn(amount); //burn balance 
+    function migrate() external {
+        uint amount = IBEP20(BASEv2).balanceOf(msg.sender); //Get balance of sender
+        require(IBEP20(address(this)).allowance(msg.sender, address(this)) > amount, "ALLOWANCE");  //Check allowance 
+        require(IBEP20(BASEv2).transferFrom(msg.sender, address(this), amount)); //Transfer balance from sender
+        IBEP20(BASEv2).burn(amount); //burn balance 
         _mint(msg.sender, amount); // 1:1
     }
 
-    function mintFromDAO(uint256 amount, address recipient) external onlyDAO {
-        require(amount <= 5 * 10**6 * 10**decimals, '!5m'); //5m at a time
-        if(minting && (totalSupply <=  150 * 10**6 * 10**decimals)){ // Only can mint up to 150m
-             _mint(recipient, amount); 
-        }
+
+    //=========================================Heler================================================//
+     function RESERVE() internal view returns(address){
+        return iHANDLER(HANDLER).RESERVE(); 
     }
 
-    //======================================HELPERS========================================//
-    // Helper Functions
-    function UTILS() internal view returns(address){
-        return iDAO(DAO).UTILS();
-    }
-    function RESERVE() internal view returns(address){
-        return iDAO(DAO).RESERVE(); 
-    }
 
 }

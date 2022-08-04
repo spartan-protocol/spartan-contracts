@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.3;
 
 interface IBEP20 {
@@ -77,6 +78,13 @@ interface IBEP20 {
     function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
 
     /**
+     * @dev Burns `amount` tokens from `sender`, `amount` is then deducted from the caller's
+     * balance.
+     */
+
+    function burn(uint amount) external;
+
+    /**
      * @dev Emitted when `value` tokens are moved from one account (`from`) to
      * another (`to`).
      *
@@ -89,4 +97,6 @@ interface IBEP20 {
      * a call to {approve}. `value` is the new allowance.
      */
     event Approval(address indexed owner, address indexed spender, uint256 value);
+
+
 }
