@@ -23,88 +23,237 @@ contract Swim is iBEP20 {
 
     //========================================iBEP20=========================================//
 
-    function name() external view override returns (string memory) {
-        return _name;
-    }
+    /**
+   * @dev Returns the bep token owner.
+   */
+  function getOwner() external view returns (address) {
+    return owner();
+  }
 
-    function symbol() external view override returns (string memory) {
-        return _symbol;
-    }
+  /**
+   * @dev Returns the token decimals.
+   */
+  function decimals() external view returns (uint8) {
+    return _decimals;
+  }
 
-    function balanceOf(address account) public view override returns (uint256) {
-        return _balances[account];
-    }
+  /**
+   * @dev Returns the token symbol.
+   */
+  function symbol() external view returns (string memory) {
+    return _symbol;
+  }
 
-    function allowance(address owner, address spender) public view virtual override returns (uint256) {
-        return _allowances[owner][spender];
-    }
+  /**
+  * @dev Returns the token name.
+  */
+  function name() external view returns (string memory) {
+    return _name;
+  }
 
-    function transfer(address recipient, uint256 amount) external virtual override returns (bool) {
-        _transfer(msg.sender, recipient, amount);
-        return true;
-    }
+  /**
+   * @dev See {BEP20-totalSupply}.
+   */
+  function totalSupply() external view returns (uint256) {
+    return _totalSupply;
+  }
 
-    function approve(address spender, uint256 amount) external virtual override returns (bool) {
-        _approve(msg.sender, spender, amount);
-        return true;
-    }
+  /**
+   * @dev See {BEP20-balanceOf}.
+   */
+  function balanceOf(address account) external view returns (uint256) {
+    return _balances[account];
+  }
 
-    function increaseAllowance(address spender, uint256 addedValue) external virtual returns (bool) {
-        _approve(msg.sender, spender, _allowances[msg.sender][spender] + addedValue);
-        return true;
-    }
+  /**
+   * @dev See {BEP20-transfer}.
+   *
+   * Requirements:
+   *
+   * - `recipient` cannot be the zero address.
+   * - the caller must have a balance of at least `amount`.
+   */
+  function transfer(address recipient, uint256 amount) external returns (bool) {
+    _transfer(_msgSender(), recipient, amount);
+    return true;
+  }
 
-    function decreaseAllowance(address spender, uint256 subtractedValue) external virtual returns (bool) {
-        uint256 currentAllowance = _allowances[msg.sender][spender];
-        require(currentAllowance >= subtractedValue, "!approval");
-        _approve(msg.sender, spender, currentAllowance - subtractedValue);
-        return true;
-    }
+  /**
+   * @dev See {BEP20-allowance}.
+   */
+  function allowance(address owner, address spender) external view returns (uint256) {
+    return _allowances[owner][spender];
+  }
 
-    function _approve(address owner, address spender, uint256 amount) internal virtual {
-        require(owner != address(0), "!owner");
-        require(spender != address(0), "!spender");
-        _allowances[owner][spender] = amount;
-        emit Approval(owner, spender, amount);
-    }
+  /**
+   * @dev See {BEP20-approve}.
+   *
+   * Requirements:
+   *
+   * - `spender` cannot be the zero address.
+   */
+  function approve(address spender, uint256 amount) external returns (bool) {
+    _approve(_msgSender(), spender, amount);
+    return true;
+  }
 
-    function transferFrom(address sender, address recipient, uint256 amount) external virtual override returns (bool) {
-        _transfer(sender, recipient, amount);
-        uint256 currentAllowance = _allowances[sender][msg.sender];
-        require(currentAllowance >= amount, "!approval");
-        _approve(sender, msg.sender, currentAllowance - amount);
-        return true;
-    }
+  /**
+   * @dev See {BEP20-transferFrom}.
+   *
+   * Emits an {Approval} event indicating the updated allowance. This is not
+   * required by the EIP. See the note at the beginning of {BEP20};
+   *
+   * Requirements:
+   * - `sender` and `recipient` cannot be the zero address.
+   * - `sender` must have a balance of at least `amount`.
+   * - the caller must have allowance for `sender`'s tokens of at least
+   * `amount`.
+   */
+  function transferFrom(address sender, address recipient, uint256 amount) external returns (bool) {
+    _transfer(sender, recipient, amount);
+    _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "BEP20: transfer amount exceeds allowance"));
+    return true;
+  }
 
-    function _transfer(address sender, address recipient, uint256 amount) internal virtual {
-        require(sender != address(0), "!sender");
-        require(recipient != address(0), '!BURN');
-        uint256 senderBalance = _balances[sender];
-        require(senderBalance >= amount, "!balance");
-        _balances[sender] = senderBalance - amount;
-        _balances[recipient] += amount;
-        emit Transfer(sender, recipient, amount);
-    }
+  /**
+   * @dev Atomically increases the allowance granted to `spender` by the caller.
+   *
+   * This is an alternative to {approve} that can be used as a mitigation for
+   * problems described in {BEP20-approve}.
+   *
+   * Emits an {Approval} event indicating the updated allowance.
+   *
+   * Requirements:
+   *
+   * - `spender` cannot be the zero address.
+   */
+  function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
+    _approve(_msgSender(), spender, _allowances[_msgSender()][spender].add(addedValue));
+    return true;
+  }
 
-    function _mint(address account, uint256 amount) internal virtual {
-        require(account != address(0), "!account");
-        totalSupply += amount;
-        _balances[account] += amount;
-        emit Transfer(address(0), account, amount);
-    }
+  /**
+   * @dev Atomically decreases the allowance granted to `spender` by the caller.
+   *
+   * This is an alternative to {approve} that can be used as a mitigation for
+   * problems described in {BEP20-approve}.
+   *
+   * Emits an {Approval} event indicating the updated allowance.
+   *
+   * Requirements:
+   *
+   * - `spender` cannot be the zero address.
+   * - `spender` must have allowance for the caller of at least
+   * `subtractedValue`.
+   */
+  function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) {
+    _approve(_msgSender(), spender, _allowances[_msgSender()][spender].sub(subtractedValue, "BEP20: decreased allowance below zero"));
+    return true;
+  }
 
-    function burn(uint256 amount) external virtual override {
-        _burn(msg.sender, amount);
-    }
+  /**
+   * @dev Creates `amount` tokens and assigns them to `msg.sender`, increasing
+   * the total supply.
+   *
+   * Requirements
+   *
+   * - `msg.sender` must be the token owner
+   */
+  function mint(uint256 amount) public onlyOwner returns (bool) {
+    _mint(_msgSender(), amount);
+    return true;
+  }
 
-    function _burn(address account, uint256 amount) internal virtual {
-        require(account != address(0), "!account");
-        uint256 accountBalance = _balances[account];
-        require(accountBalance >= amount, "!balance");
-        _balances[account] = accountBalance - amount;
-        totalSupply -= amount;
-        emit Transfer(account, address(0), amount);
-    }
+  /**
+   * @dev Moves tokens `amount` from `sender` to `recipient`.
+   *
+   * This is internal function is equivalent to {transfer}, and can be used to
+   * e.g. implement automatic token fees, slashing mechanisms, etc.
+   *
+   * Emits a {Transfer} event.
+   *
+   * Requirements:
+   *
+   * - `sender` cannot be the zero address.
+   * - `recipient` cannot be the zero address.
+   * - `sender` must have a balance of at least `amount`.
+   */
+  function _transfer(address sender, address recipient, uint256 amount) internal {
+    require(sender != address(0), "BEP20: transfer from the zero address");
+    require(recipient != address(0), "BEP20: transfer to the zero address");
+
+    _balances[sender] = _balances[sender].sub(amount, "BEP20: transfer amount exceeds balance");
+    _balances[recipient] = _balances[recipient].add(amount);
+    emit Transfer(sender, recipient, amount);
+  }
+
+  /** @dev Creates `amount` tokens and assigns them to `account`, increasing
+   * the total supply.
+   *
+   * Emits a {Transfer} event with `from` set to the zero address.
+   *
+   * Requirements
+   *
+   * - `to` cannot be the zero address.
+   */
+  function _mint(address account, uint256 amount) internal {
+    require(account != address(0), "BEP20: mint to the zero address");
+
+    _totalSupply = _totalSupply.add(amount);
+    _balances[account] = _balances[account].add(amount);
+    emit Transfer(address(0), account, amount);
+  }
+
+  /**
+   * @dev Destroys `amount` tokens from `account`, reducing the
+   * total supply.
+   *
+   * Emits a {Transfer} event with `to` set to the zero address.
+   *
+   * Requirements
+   *
+   * - `account` cannot be the zero address.
+   * - `account` must have at least `amount` tokens.
+   */
+  function _burn(address account, uint256 amount) internal {
+    require(account != address(0), "BEP20: burn from the zero address");
+
+    _balances[account] = _balances[account].sub(amount, "BEP20: burn amount exceeds balance");
+    _totalSupply = _totalSupply.sub(amount);
+    emit Transfer(account, address(0), amount);
+  }
+
+  /**
+   * @dev Sets `amount` as the allowance of `spender` over the `owner`s tokens.
+   *
+   * This is internal function is equivalent to `approve`, and can be used to
+   * e.g. set automatic allowances for certain subsystems, etc.
+   *
+   * Emits an {Approval} event.
+   *
+   * Requirements:
+   *
+   * - `owner` cannot be the zero address.
+   * - `spender` cannot be the zero address.
+   */
+  function _approve(address owner, address spender, uint256 amount) internal {
+    require(owner != address(0), "BEP20: approve from the zero address");
+    require(spender != address(0), "BEP20: approve to the zero address");
+
+    _allowances[owner][spender] = amount;
+    emit Approval(owner, spender, amount);
+  }
+
+  /**
+   * @dev Destroys `amount` tokens from `account`.`amount` is then deducted
+   * from the caller's allowance.
+   *
+   * See {_burn} and {_approve}.
+   */
+  function _burnFrom(address account, uint256 amount) internal {
+    _burn(account, amount);
+    _approve(account, _msgSender(), _allowances[account][_msgSender()].sub(amount, "BEP20: burn amount exceeds allowance"));
+  }
 
     //====================================POOL FUNCTIONS =================================//
 
