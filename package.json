@@ -1,0 +1,9 @@
+{
+  "name": "spartan-contracts",
+  "version": "0.0.1",
+  "repository": "https://github.com/spartan-protocol/spartan-contracts.git",
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "hardhat": "^2.10.2"
+  }
+}
