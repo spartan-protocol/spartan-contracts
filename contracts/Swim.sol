@@ -3,7 +3,7 @@ pragma solidity 0.8.3;
 import "./iBEP20.sol"; 
 
 
-contract Swim is iBEP20 {  
+contract Pool is iBEP20 {  
     address public immutable ASSET;  //Settlement Asset
     address public immutable TOKEN;  //Paired Token
     uint256 public AssetDepth;       //Settlement Asset Depth
