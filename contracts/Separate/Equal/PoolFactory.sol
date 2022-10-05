@@ -9,9 +9,14 @@ pragma solidity 0.8.9;
  * 4 assets = 6 pairs && 1 pool
  * ... etc
  *
- * Notes for friendly integrations:
+ * -- Notes for friendly integrations:
  * Follow the UniV2 event names and structure for easy integration with data aggregators
  * Consider following the UniV2 var + function names and structure for easy integration with data & also swap aggregators
+ *
+ * -- Notes for var arrays like 'address[] public allPools':
+ * Supply a '.length' getter rather than returning 'address[] memory' for scalability
+ * Also supply a mapping to grab an individual item from the array by index. ie. 'mapping(address => mapping(address => address)) public getPool'
+ * Interfacing contract can then loop and multicall the public allPools var using id ranges
  */
 contract PoolFactory {
     /** Vars */
@@ -32,7 +37,7 @@ contract PoolFactory {
         address pair,
         uint256 id
     ); // Use UniV2 event structure for easier integration with data aggregators
-    
+
     event PoolCreated(
         address[] tokens,
         address[] pairs,
