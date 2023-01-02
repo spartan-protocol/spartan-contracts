@@ -2,12 +2,11 @@
 pragma solidity 0.8.3;
 import "./iBEP20.sol"; 
 
-
 contract Pool is iBEP20 {  
     address public immutable ASSET;  //Settlement Asset
     address public immutable TOKEN;  //Paired Token
-    uint256 public AssetDepth;       //Settlement Asset Depth
-    uint256 public TokenDepth;       //Pair Token Depth
+    uint256 public assetDepth;       //Settlement Asset Depth
+    uint256 public tokenDepth;       //Pair Token Depth
 
     string private _name;                                                  //Name of Aquarium 
     string private _symbol;                                                //Aquarium Symbol
@@ -17,8 +16,15 @@ contract Pool is iBEP20 {
     mapping(address => mapping(address => uint)) private _allowances;
     
    
-    constructor () {
-      
+    constructor (address _base, address _token) {
+        ASSET = _base;
+        TOKEN = _token;
+        string memory poolName = "-SpartanProtocolPool";
+        string memory poolSymbol = "-SPA";
+        _name = string(abi.encodePacked(iBEP20(_token).name(), poolName));
+        _symbol = string(abi.encodePacked(iBEP20(_token).symbol(), poolSymbol));
+        decimals = 18;
+        genesis = block.timestamp;
     }
 
     //========================================iBEP20=========================================//
@@ -258,17 +264,41 @@ contract Pool is iBEP20 {
     //====================================POOL FUNCTIONS =================================//
 
 
-    function add() external returns (){
+    function add() external returns(uint256){
+      
    
     }
 
-    function remove() external returns () {
+    function remove() external returns (bool) {
     
     }
 
-    function swap() external  returns () {
+    function swap() external  returns (uint) {
         
     }
+
+      // Check the TOKEN amount received by this Pool
+    function _checkTokenDepth() internal view returns(uint256 _actual){
+        uint _tokenBalance = iBEP20(TOKEN).balanceOf(address(this)); 
+        if(_tokenBalance > tokenDepth){
+            _actual = _tokenBalance - tokenDepth;
+        } else {
+            _actual = 0;
+        }
+        return _actual;
+    }
+
+     // Check the SPARTA amount received by this Pool
+    function _checkAssetDepth() internal view returns(uint256 _actual){
+        uint _assetBalance = iBEP20(BASE).balanceOf(address(this));
+        if(_assetBalance > assetDepth){
+            _actual = _assetBalance - assetDepth;
+        } else {
+            _actual = 0;
+        }
+        return _actual;
+    }
+  
 
     
  

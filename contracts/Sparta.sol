@@ -9,7 +9,7 @@ contract Sparta is IBEP20 {
 
     // BEP-20 Parameters
     string public constant override name = 'Spartan Protocol Token V3';
-    string public constant override symbol = 'SPARTA';
+    string public constant override symbol = 'SPT';
     uint8 public constant override decimals = 18;
     uint256 public override totalSupply;
 
@@ -51,7 +51,7 @@ contract Sparta is IBEP20 {
         DEPLOYER = msg.sender;
         _balances[msg.sender] = 1 * 10**7 * 10**decimals;
         totalSupply = 1 * 10**6 * 10**decimals;
-        emit Transfer(address(0), msg.sender, totalSupply);
+        emit Transfer(address(0), msg.sender, totalSupply);z
     }
 
     //========================================iBEP20=========================================//
