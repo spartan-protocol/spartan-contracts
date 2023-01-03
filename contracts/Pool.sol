@@ -1,16 +1,18 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.3;
-import "./iBEP20.sol"; 
+import "./iBEP20.sol";
+import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 
-contract Pool is iBEP20 {  
+contract Pool is IBEP20 {  
     address public immutable ASSET;  //Settlement Asset
     address public immutable TOKEN;  //Paired Token
     uint256 public assetDepth;       //Settlement Asset Depth
     uint256 public tokenDepth;       //Pair Token Depth
 
-    string private _name;                                                  //Name of Aquarium 
-    string private _symbol;                                                //Aquarium Symbol
-    uint8 public override immutable decimals;                              //Decimals of Aquarium A
+    string private _name;                                                  //Name of Savers 
+    string private _symbol;                                                //Savers Symbol
+    uint8 public override immutable decimals;                              //Decimals of Saver's Base
+    uint256 public immutable genesis;                                        // Timestamp from when the Savers was first deployed (For UI)                              
     uint256 public override totalSupply;
     mapping(address => uint) private _balances;
     mapping(address => mapping(address => uint)) private _allowances;
@@ -19,29 +21,15 @@ contract Pool is iBEP20 {
     constructor (address _base, address _token) {
         ASSET = _base;
         TOKEN = _token;
-        string memory poolName = "-SpartanProtocolPool";
-        string memory poolSymbol = "-SPA";
-        _name = string(abi.encodePacked(iBEP20(_token).name(), poolName));
-        _symbol = string(abi.encodePacked(iBEP20(_token).symbol(), poolSymbol));
+        string memory poolName = "-SpartanProtocolSavers";
+        string memory poolSymbol = "-SPS";
+        _name = string(abi.encodePacked(IBEP20(_token).name(), poolName));
+        _symbol = string(abi.encodePacked(IBEP20(_token).symbol(), poolSymbol));
         decimals = 18;
         genesis = block.timestamp;
     }
 
-    //========================================iBEP20=========================================//
-
-    /**
-   * @dev Returns the bep token owner.
-   */
-  function getOwner() external view returns (address) {
-    return owner();
-  }
-
-  /**
-   * @dev Returns the token decimals.
-   */
-  function decimals() external view returns (uint8) {
-    return _decimals;
-  }
+    //========================================IBEP20=========================================//
 
   /**
    * @dev Returns the token symbol.
@@ -56,14 +44,6 @@ contract Pool is iBEP20 {
   function name() external view returns (string memory) {
     return _name;
   }
-
-  /**
-   * @dev See {BEP20-totalSupply}.
-   */
-  function totalSupply() external view returns (uint256) {
-    return _totalSupply;
-  }
-
   /**
    * @dev See {BEP20-balanceOf}.
    */
@@ -158,19 +138,6 @@ contract Pool is iBEP20 {
   }
 
   /**
-   * @dev Creates `amount` tokens and assigns them to `msg.sender`, increasing
-   * the total supply.
-   *
-   * Requirements
-   *
-   * - `msg.sender` must be the token owner
-   */
-  function mint(uint256 amount) public onlyOwner returns (bool) {
-    _mint(_msgSender(), amount);
-    return true;
-  }
-
-  /**
    * @dev Moves tokens `amount` from `sender` to `recipient`.
    *
    * This is internal function is equivalent to {transfer}, and can be used to
@@ -205,7 +172,7 @@ contract Pool is iBEP20 {
   function _mint(address account, uint256 amount) internal {
     require(account != address(0), "BEP20: mint to the zero address");
 
-    _totalSupply = _totalSupply.add(amount);
+    totalSupply = totalSupply.add(amount);
     _balances[account] = _balances[account].add(amount);
     emit Transfer(address(0), account, amount);
   }
@@ -225,7 +192,7 @@ contract Pool is iBEP20 {
     require(account != address(0), "BEP20: burn from the zero address");
 
     _balances[account] = _balances[account].sub(amount, "BEP20: burn amount exceeds balance");
-    _totalSupply = _totalSupply.sub(amount);
+    totalSupply = totalSupply.sub(amount);
     emit Transfer(account, address(0), amount);
   }
 
@@ -264,9 +231,10 @@ contract Pool is iBEP20 {
     //====================================POOL FUNCTIONS =================================//
 
 
+
+
     function add() external returns(uint256){
-      
-   
+       
     }
 
     function remove() external returns (bool) {
@@ -277,22 +245,25 @@ contract Pool is iBEP20 {
         
     }
 
-      // Check the TOKEN amount received by this Pool
-    function _checkTokenDepth() internal view returns(uint256 _actual){
-        uint _tokenBalance = iBEP20(TOKEN).balanceOf(address(this)); 
-        if(_tokenBalance > tokenDepth){
-            _actual = _tokenBalance - tokenDepth;
+  
+    
+
+     // Check the SPARTA amount received by this Pool
+    function _checkAssetDepth() internal view returns(uint256 _actual){
+        uint _assetBalance = IBEP20(ASSET).balanceOf(address(this));
+        if(_assetBalance > assetDepth){
+            _actual = _assetBalance - assetDepth;
         } else {
             _actual = 0;
         }
         return _actual;
     }
 
-     // Check the SPARTA amount received by this Pool
-    function _checkAssetDepth() internal view returns(uint256 _actual){
-        uint _assetBalance = iBEP20(BASE).balanceOf(address(this));
-        if(_assetBalance > assetDepth){
-            _actual = _assetBalance - assetDepth;
+      // Check the TOKEN amount received by this Pool
+    function _checkTokenDepth() internal view returns(uint256 _actual){
+        uint _tokenBalance = IBEP20(TOKEN).balanceOf(address(this)); 
+        if(_tokenBalance > tokenDepth){
+            _actual = _tokenBalance - tokenDepth;
         } else {
             _actual = 0;
         }
