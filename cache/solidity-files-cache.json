@@ -1,12 +1,158 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "C:\\Users\\User\\Documents\\GitHub\\spartan-contracts\\contracts\\auth.sol": {
-      "lastModificationDate": 1651055520581,
-      "contentHash": "8984a6d3d93042b67e78f58fd198a3d7",
-      "sourceName": "contracts/auth.sol",
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\BSC-Library\\iBEP20.sol": {
+      "lastModificationDate": 1672833720057,
+      "contentHash": "9984d0b3b5ebdd58ccbb76f0b495da19",
+      "sourceName": "contracts/BSC-Library/iBEP20.sol",
       "solcConfig": {
-        "version": "0.8.3",
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.9"
+      ],
+      "artifacts": [
+        "iBEP20"
+      ]
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\Sparta.sol": {
+      "lastModificationDate": 1672833527914,
+      "contentHash": "ccb5f3704ffc4d3563d64d959b67bde9",
+      "sourceName": "contracts/Sparta.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./BSC-Library/iBEP20.sol",
+        "./iHANDLER.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.9"
+      ],
+      "artifacts": [
+        "Sparta"
+      ]
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\iHANDLER.sol": {
+      "lastModificationDate": 1672831064479,
+      "contentHash": "c250c78e4721ebc671df1bf3837609de",
+      "sourceName": "contracts/iHANDLER.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.9"
+      ],
+      "artifacts": [
+        "iHANDLER"
+      ]
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\Pool.sol": {
+      "lastModificationDate": 1672833493618,
+      "contentHash": "1134b8ac8041e0ef230cbe2d70729438",
+      "sourceName": "contracts/Pool.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./BSC-Library/iBEP20.sol",
+        "@openzeppelin/contracts/utils/math/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.9"
+      ],
+      "artifacts": [
+        "Pool"
+      ]
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\node_modules\\@openzeppelin\\contracts\\utils\\math\\SafeMath.sol": {
+      "lastModificationDate": 1672830677093,
+      "contentHash": "2337f0279507b5edf14a07067adf0d05",
+      "sourceName": "@openzeppelin/contracts/utils/math/SafeMath.sol",
+      "solcConfig": {
+        "version": "0.8.9",
         "settings": {
           "optimizer": {
             "enabled": false,
@@ -33,7 +179,116 @@
         "^0.8.0"
       ],
       "artifacts": [
-        "Auth"
+        "SafeMath"
+      ]
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\BSC-Library\\SafeBEP20.sol": {
+      "lastModificationDate": 1672833578705,
+      "contentHash": "12c0cd42f14bf5197ada3bc7063f3862",
+      "sourceName": "contracts/BSC-Library/SafeBEP20.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./iBEP20.sol",
+        "@openzeppelin/contracts/utils/Address.sol",
+        "@openzeppelin/contracts/utils/math/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.9"
+      ],
+      "artifacts": [
+        "SafeBEP20"
+      ]
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\node_modules\\@openzeppelin\\contracts\\utils\\Address.sol": {
+      "lastModificationDate": 1672830676996,
+      "contentHash": "f31ad6fc4bbf9c06203987220156a6ba",
+      "sourceName": "@openzeppelin/contracts/utils/Address.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.1"
+      ],
+      "artifacts": [
+        "Address"
+      ]
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\TOOLS.sol": {
+      "lastModificationDate": 1672831701548,
+      "contentHash": "a1cfb175a24970fd0e3c344a33bcbf16",
+      "sourceName": "contracts/TOOLS.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.9"
+      ],
+      "artifacts": [
+        "TOOLS"
       ]
     }
   }

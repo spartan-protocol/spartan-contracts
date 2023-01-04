@@ -4,8 +4,17 @@
 
 // hardhat.config.js
 require('@nomiclabs/hardhat-ethers');
+require("@nomiclabs/hardhat-ethers");
+require("@nomiclabs/hardhat-truffle5");
+
 
 module.exports = {
-  solidity: "0.8.3",
+  solidity: {
+    compilers: [
+      {
+        version: "0.8.9",
+      },
+    ],
+  }
 };
 

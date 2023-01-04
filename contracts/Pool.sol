@@ -1,9 +1,11 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.3;
-import "./iBEP20.sol";
-import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
+//SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.9;
+import "./BSC-Library/iBEP20.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-contract Pool is IBEP20 {  
+abstract contract Pool is iBEP20 {  
+    using SafeMath for uint256;
+
     address public immutable ASSET;  //Settlement Asset
     address public immutable TOKEN;  //Paired Token
     uint256 public assetDepth;       //Settlement Asset Depth
@@ -23,8 +25,8 @@ contract Pool is IBEP20 {
         TOKEN = _token;
         string memory poolName = "-SpartanProtocolSavers";
         string memory poolSymbol = "-SPS";
-        _name = string(abi.encodePacked(IBEP20(_token).name(), poolName));
-        _symbol = string(abi.encodePacked(IBEP20(_token).symbol(), poolSymbol));
+        _name = string(abi.encodePacked(iBEP20(_token).name(), poolName));
+        _symbol = string(abi.encodePacked(iBEP20(_token).symbol(), poolSymbol));
         decimals = 18;
         genesis = block.timestamp;
     }
@@ -60,7 +62,7 @@ contract Pool is IBEP20 {
    * - the caller must have a balance of at least `amount`.
    */
   function transfer(address recipient, uint256 amount) external returns (bool) {
-    _transfer(_msgSender(), recipient, amount);
+    _transfer(msg.sender, recipient, amount);
     return true;
   }
 
@@ -79,7 +81,7 @@ contract Pool is IBEP20 {
    * - `spender` cannot be the zero address.
    */
   function approve(address spender, uint256 amount) external returns (bool) {
-    _approve(_msgSender(), spender, amount);
+    _approve(msg.sender, spender, amount);
     return true;
   }
 
@@ -97,7 +99,7 @@ contract Pool is IBEP20 {
    */
   function transferFrom(address sender, address recipient, uint256 amount) external returns (bool) {
     _transfer(sender, recipient, amount);
-    _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "BEP20: transfer amount exceeds allowance"));
+    _approve(sender, msg.sender, _allowances[sender][msg.sender].sub(amount, "BEP20: transfer amount exceeds allowance"));
     return true;
   }
 
@@ -114,7 +116,7 @@ contract Pool is IBEP20 {
    * - `spender` cannot be the zero address.
    */
   function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
-    _approve(_msgSender(), spender, _allowances[_msgSender()][spender].add(addedValue));
+    _approve(msg.sender, spender, _allowances[msg.sender][spender].add(addedValue));
     return true;
   }
 
@@ -133,7 +135,7 @@ contract Pool is IBEP20 {
    * `subtractedValue`.
    */
   function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) {
-    _approve(_msgSender(), spender, _allowances[_msgSender()][spender].sub(subtractedValue, "BEP20: decreased allowance below zero"));
+    _approve(msg.sender, spender, _allowances[msg.sender][spender].sub(subtractedValue, "BEP20: decreased allowance below zero"));
     return true;
   }
 
@@ -225,7 +227,7 @@ contract Pool is IBEP20 {
    */
   function _burnFrom(address account, uint256 amount) internal {
     _burn(account, amount);
-    _approve(account, _msgSender(), _allowances[account][_msgSender()].sub(amount, "BEP20: burn amount exceeds allowance"));
+    _approve(account, msg.sender, _allowances[account][msg.sender].sub(amount, "BEP20: burn amount exceeds allowance"));
   }
 
     //====================================POOL FUNCTIONS =================================//
@@ -234,6 +236,8 @@ contract Pool is IBEP20 {
 
 
     function add() external returns(uint256){
+      //  uint256 _actualInputAsset = _checkAssetDepth(); // Get the received ASSET amount
+        
        
     }
 
@@ -246,11 +250,11 @@ contract Pool is IBEP20 {
     }
 
   
-    
+    //=======================================INTERNAL LOGIC======================================//
 
-     // Check the SPARTA amount received by this Pool
+     // Check the ASSET amount received by this Pool
     function _checkAssetDepth() internal view returns(uint256 _actual){
-        uint _assetBalance = IBEP20(ASSET).balanceOf(address(this));
+        uint _assetBalance = iBEP20(ASSET).balanceOf(address(this));
         if(_assetBalance > assetDepth){
             _actual = _assetBalance - assetDepth;
         } else {
@@ -261,7 +265,7 @@ contract Pool is IBEP20 {
 
       // Check the TOKEN amount received by this Pool
     function _checkTokenDepth() internal view returns(uint256 _actual){
-        uint _tokenBalance = IBEP20(TOKEN).balanceOf(address(this)); 
+        uint _tokenBalance = iBEP20(TOKEN).balanceOf(address(this)); 
         if(_tokenBalance > tokenDepth){
             _actual = _tokenBalance - tokenDepth;
         } else {
@@ -269,7 +273,8 @@ contract Pool is IBEP20 {
         }
         return _actual;
     }
-  
+
+   
 
     
  

@@ -1,12 +1,10 @@
-
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.3;
-import "./iBEP20.sol";
+pragma solidity ^0.8.9;
+import "./BSC-Library/iBEP20.sol";
 import "./iHANDLER.sol";
 
     //======================================SPARTA=========================================//
-contract Sparta is IBEP20 {
-
+contract Sparta is iBEP20 {
     // BEP-20 Parameters
     string public constant override name = 'Spartan Protocol Token V3';
     string public constant override symbol = 'SPT';
@@ -49,14 +47,18 @@ contract Sparta is IBEP20 {
         secondsPerEra =  86400; // 1 day
         nextEraTime = block.timestamp + secondsPerEra;
         DEPLOYER = msg.sender;
-        _balances[msg.sender] = 1 * 10**7 * 10**decimals;
-        totalSupply = 1 * 10**6 * 10**decimals;
-        emit Transfer(address(0), msg.sender, totalSupply);z
+         _balances[msg.sender] = 1 * 10**7 * 10**decimals;     // TestHelper Only!!!
+         totalSupply = 1 * 10**6 * 10**decimals;               // TestHelper Only!!!
+        emit Transfer(address(0), msg.sender, totalSupply);
     }
 
     //========================================iBEP20=========================================//
     function balanceOf(address account) public view override returns (uint256) {
         return _balances[account];
+    }
+
+    function getOwner() public view returns(address){
+        return DEPLOYER;
     }
     function allowance(address owner, address spender) public view virtual override returns (uint256) {
         return _allowances[owner][spender];
@@ -192,10 +194,10 @@ contract Sparta is IBEP20 {
 
     //==========================================Minting============================================//
     function migrate() external {
-        uint amount = IBEP20(BASEv2).balanceOf(msg.sender); //Get balance of sender
-        require(IBEP20(address(this)).allowance(msg.sender, address(this)) > amount, "ALLOWANCE");  //Check allowance 
-        require(IBEP20(BASEv2).transferFrom(msg.sender, address(this), amount)); //Transfer balance from sender
-        IBEP20(BASEv2).burn(amount); //burn balance 
+        uint amount = iBEP20(BASEv2).balanceOf(msg.sender); //Get balance of sender
+        require(iBEP20(address(this)).allowance(msg.sender, address(this)) > amount, "ALLOWANCE");  //Check allowance 
+        require(iBEP20(BASEv2).transferFrom(msg.sender, address(this), amount)); //Transfer balance from sender
+        iBEP20(BASEv2).burn(amount); //burn balance 
         _mint(msg.sender, amount); // 1:1
     }
 

@@ -1,0 +1,66 @@
+{
+    "contractName": "TOOLS",
+    "abi": [],
+    "metadata": "{\"compiler\":{\"version\":\"0.8.9+commit.e5eed63a\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"c:/Users/User/Documents/SpartaDev/spartan-contracts/contracts/TOOLS.sol\":\"TOOLS\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"c:/Users/User/Documents/SpartaDev/spartan-contracts/contracts/TOOLS.sol\":{\"keccak256\":\"0x4b9c8135c099faa758c975883fe14afa363f6669c3ddad1f24198cb206e8c2ac\",\"license\":\"UNLICENSED\",\"urls\":[\"bzz-raw://a3d87680f0db6cf5fec98cc6110ef1bb2310c44cb3bb7468d41c21945e003096\",\"dweb:/ipfs/QmYnLLbhZThzk7CkFYafm6g6xzcsweHJxx5cWhqbJhEB8N\"]}},\"version\":1}",
+    "bytecode": "6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea2646970667358221220bad20f1e65065772f74bee75db9ebdf240fc06fa0ef5667025ff84c31d04f49164736f6c63430008090033",
+    "deployedBytecode": "6080604052600080fdfea2646970667358221220bad20f1e65065772f74bee75db9ebdf240fc06fa0ef5667025ff84c31d04f49164736f6c63430008090033",
+    "sourceMap": "68:25:5:-:0;;;;;;;;;;;;;;;;;;;",
+    "deployedSourceMap": "68:25:5:-:0;;;;;",
+    "sourcePath": "c:/Users/User/Documents/SpartaDev/spartan-contracts/contracts/TOOLS.sol",
+    "compiler": {
+        "name": "solc",
+        "version": "0.8.9+commit.e5eed63a"
+    },
+    "ast": {
+        "absolutePath": "c:/Users/User/Documents/SpartaDev/spartan-contracts/contracts/TOOLS.sol",
+        "exportedSymbols": {
+            "TOOLS": [
+                1811
+            ]
+        },
+        "id": 1812,
+        "license": "UNLICENSED",
+        "nodeType": "SourceUnit",
+        "nodes": [
+            {
+                "id": 1810,
+                "literals": [
+                    "solidity",
+                    "^",
+                    "0.8",
+                    ".9"
+                ],
+                "nodeType": "PragmaDirective",
+                "src": "39:23:5"
+            },
+            {
+                "abstract": false,
+                "baseContracts": [],
+                "canonicalName": "TOOLS",
+                "contractDependencies": [],
+                "contractKind": "contract",
+                "fullyImplemented": true,
+                "id": 1811,
+                "linearizedBaseContracts": [
+                    1811
+                ],
+                "name": "TOOLS",
+                "nameLocation": "77:5:5",
+                "nodeType": "ContractDefinition",
+                "nodes": [],
+                "scope": 1812,
+                "src": "68:25:5",
+                "usedErrors": []
+            }
+        ],
+        "src": "39:54:5"
+    },
+    "functionHashes": {},
+    "gasEstimates": {
+        "creation": {
+            "codeDepositCost": "12600",
+            "executionCost": "66",
+            "totalCost": "12666"
+        }
+    }
+}
