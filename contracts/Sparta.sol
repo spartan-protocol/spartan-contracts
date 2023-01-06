@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 import "./BSC-Library/iBEP20.sol";
-import "./iHANDLER.sol";
+import "./Interfaces/iHANDLER.sol";
 
     //======================================SPARTA=========================================//
 contract Sparta is iBEP20 {
