@@ -49,7 +49,7 @@ contract Sparta is iBEP20 {
         DEPLOYER = msg.sender;
          _balances[msg.sender] = 1 * 10**7 * 10**decimals;     // TestHelper Only!!!
          totalSupply = 1 * 10**6 * 10**decimals;               // TestHelper Only!!!
-        emit Transfer(address(0), msg.sender, totalSupply);
+        emit Transfer(address(0), msg.sender, totalSupply);    // TestHelper Only!!!
     }
 
     //========================================iBEP20=========================================//
@@ -143,7 +143,7 @@ contract Sparta is iBEP20 {
     }
 
 
-    //=========================================DAO=========================================//
+    //=========================================CORE FUNCTIONS=========================================//
     // Can start
     function flipEmissions() external onlyDEPLOYER {
         emitting = !emitting;

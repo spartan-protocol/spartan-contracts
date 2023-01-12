@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 import "./BSC-Library/iBEP20.sol";
+import "./Interfaces/iHANDLER.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 abstract contract Pool is iBEP20 {  
@@ -20,13 +21,14 @@ abstract contract Pool is iBEP20 {
     mapping(address => mapping(address => uint)) private _allowances;
     
    
-    constructor (address _base, address _token) {
-        ASSET = _base;
+    constructor (address _asset, address _token) {
+        ASSET = _asset;
         TOKEN = _token;
-        string memory poolName = "-SpartanProtocolSavers";
-        string memory poolSymbol = "-SPS";
-        _name = string(abi.encodePacked(iBEP20(_token).name(), poolName));
-        _symbol = string(abi.encodePacked(iBEP20(_token).symbol(), poolSymbol));
+        string memory poolName = "-SpartanProtocolPool";
+        string memory poolSymbol = "-SPP";
+        string memory slash = "/";
+        _name = string(abi.encodePacked(iBEP20(_asset).name(), slash, iBEP20(_token).name(), poolName));
+        _symbol = string(abi.encodePacked(iBEP20(_asset).name(), slash, iBEP20(_token).name(), poolSymbol));
         decimals = 18;
         genesis = block.timestamp;
     }
