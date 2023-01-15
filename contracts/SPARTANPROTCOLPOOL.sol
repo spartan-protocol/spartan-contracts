@@ -4,11 +4,12 @@ import "./BSC-Library/iBEP20.sol";
 import "./Interfaces/iHANDLER.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-abstract contract Pool is iBEP20 {  
+contract SPARTANPROTCOLPOOL is iBEP20 {  
     using SafeMath for uint256;
 
     address public immutable ASSET;  //Settlement Asset
     address public immutable TOKEN;  //Paired Token
+    address public immutable FACTORY;
     uint256 public assetDepth;       //Settlement Asset Depth
     uint256 public tokenDepth;       //Pair Token Depth
 
@@ -24,6 +25,7 @@ abstract contract Pool is iBEP20 {
     constructor (address _asset, address _token) {
         ASSET = _asset;
         TOKEN = _token;
+        FACTORY = msg.sender;
         string memory poolName = "-SpartanProtocolPool";
         string memory poolSymbol = "-SPP";
         string memory slash = "/";
@@ -40,6 +42,13 @@ abstract contract Pool is iBEP20 {
    */
   function symbol() external view returns (string memory) {
     return _symbol;
+  }
+
+  /**
+   * @dev Returns the DEPLOYER.
+   */
+   function getOwner() public view returns(address){
+        return FACTORY;
   }
 
   /**
@@ -200,6 +209,11 @@ abstract contract Pool is iBEP20 {
     emit Transfer(account, address(0), amount);
   }
 
+  // Burn supply
+    function burn(uint256 amount) public virtual override {
+        _burn(msg.sender, amount);
+    }
+
   /**
    * @dev Sets `amount` as the allowance of `spender` over the `owner`s tokens.
    *
@@ -232,10 +246,9 @@ abstract contract Pool is iBEP20 {
     _approve(account, msg.sender, _allowances[account][msg.sender].sub(amount, "BEP20: burn amount exceeds allowance"));
   }
 
+  
+
     //====================================POOL FUNCTIONS =================================//
-
-
-
 
     function add() external returns(uint256){
       //  uint256 _actualInputAsset = _checkAssetDepth(); // Get the received ASSET amount
