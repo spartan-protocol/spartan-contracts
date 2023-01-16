@@ -7,17 +7,18 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 contract SPARTANPROTCOLPOOL is iBEP20 {  
     using SafeMath for uint256;
 
-    address public immutable ASSET;  //Settlement Asset
-    address public immutable TOKEN;  //Paired Token
-    address public immutable FACTORY;
-    uint256 public assetDepth;       //Settlement Asset Depth
-    uint256 public tokenDepth;       //Pair Token Depth
+    uint public constant MINIMUM_LIQUIDITY = 10**3;
+    uint128 private tokenDepth;           
+    uint128 private assetDepth;           
 
     string private _name;                                                  //Name of Savers 
     string private _symbol;                                                //Savers Symbol
     uint8 public override immutable decimals;                              //Decimals of Saver's Base
     uint256 public immutable genesis;                                        // Timestamp from when the Savers was first deployed (For UI)                              
     uint256 public override totalSupply;
+    address public immutable ASSET;  //Settlement Asset
+    address public immutable TOKEN;  //Paired Token
+    address public immutable FACTORY;
     mapping(address => uint) private _balances;
     mapping(address => mapping(address => uint)) private _allowances;
     

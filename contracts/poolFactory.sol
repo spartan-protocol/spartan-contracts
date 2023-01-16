@@ -26,11 +26,26 @@ contract PoolFactory  {
         SPARTANPROTCOLPOOL newPool;
         newPool = new SPARTANPROTCOLPOOL(token0, token1); // Deploy new pool 
         pool = address(newPool); // Get address of new pool
-        getPool[token0][token1] = pool;
+        getPool[token0][token1] = pool; 
         getPool[token1][token0] = pool; // populate mapping in the reverse direction
+        _handleTransferIn(tokenA, inputA, pool); // Transfer TOKEN liquidity to new pool
+        _handleTransferIn(tokenB, inputB, pool); // Transfer TOKEN liquidity to new pool
         allPools.push(pool);
+        isPool[pool] = true;
         emit PoolCreated(token0, token1, pool, allPools.length);
         return pool;
+    }
+
+    function _handleTransferIn(address _token, uint256 _amount, address _pool) internal  {
+        require(_amount > 0);
+        if(_token == address(0)){
+            require(_amount == msg.value);
+            (bool success, ) = payable(WBNB).call{value: _amount}(""); // Wrap BNB
+            require(success);
+            iBEP20(WBNB).transfer(_pool, _amount); // Tsf WBNB (PoolFactory -> Pool)
+        } else {
+            require(iBEP20(_token).transferFrom(msg.sender, _pool, _amount)); // Tsf TOKEN (User -> Pool)
+        }
     }
 
 
