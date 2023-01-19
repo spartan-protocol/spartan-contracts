@@ -23,9 +23,15 @@ contract PoolFactory  {
             token0 = WBNB; //Handle BNB
         }
         require(getPool[token0][token1] == address(0), "SpartanProtocalPool: POOL_EXISTS");
-        SPARTANPROTCOLPOOL newPool;
-        newPool = new SPARTANPROTCOLPOOL(token0, token1); // Deploy new pool 
-        pool = address(newPool); // Get address of new pool
+        // SPARTANPROTCOLPOOL newPool;
+        // newPool = new SPARTANPROTCOLPOOL(token0, token1); // Deploy new pool 
+        // pool = address(newPool); // Get address of new pool
+        bytes memory bytecode = type(SPARTANPROTCOLPOOL).creationCode;
+        bytes32 salt = keccak256(abi.encodePacked(token0, token1));
+        assembly {
+            pool := create2(0, add(bytecode, 32), mload(bytecode), salt)
+        }
+        ISPARTANPROTCOLPOOL(pool).initialize(token0, token1);
         getPool[token0][token1] = pool; 
         getPool[token1][token0] = pool; // populate mapping in the reverse direction
         _handleTransferIn(tokenA, inputA, pool); // Transfer TOKEN liquidity to new pool
@@ -33,7 +39,6 @@ contract PoolFactory  {
         allPools.push(pool);
         isPool[pool] = true;
         emit PoolCreated(token0, token1, pool, allPools.length);
-        return pool;
     }
 
     function _handleTransferIn(address _token, uint256 _amount, address _pool) internal  {

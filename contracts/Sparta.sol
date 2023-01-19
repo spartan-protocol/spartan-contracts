@@ -6,8 +6,8 @@ import "./Interfaces/iHANDLER.sol";
     //======================================SPARTA=========================================//
 contract Sparta is iBEP20 {
     // BEP-20 Parameters
-    string public constant override name = 'Spartan Protocol TITS';
-    string public constant override symbol = 'SPT';
+    string public constant override name = 'Spartan Protocol AGIS';
+    string public constant override symbol = 'SP';
     uint8 public constant override decimals = 18;
     uint256 public override totalSupply;
 

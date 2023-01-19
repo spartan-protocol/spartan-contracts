@@ -8,33 +8,43 @@ contract SPARTANPROTCOLPOOL is iBEP20 {
     using SafeMath for uint256;
 
     uint public constant MINIMUM_LIQUIDITY = 10**3;
+    bytes4 private constant SELECTOR = bytes4(keccak256(bytes('transfer(address,uint256)')));
+    
+    string private _name;                                                 
+    string private _symbol;
     uint128 private tokenDepth;           
     uint128 private assetDepth;           
-
-    string private _name;                                                  //Name of Savers 
-    string private _symbol;                                                //Savers Symbol
-    uint8 public override immutable decimals;                              //Decimals of Saver's Base
-    uint256 public immutable genesis;                                        // Timestamp from when the Savers was first deployed (For UI)                              
+    
+    uint8 public override  decimals;                              
+    uint256 public  genesis;                                                                  
     uint256 public override totalSupply;
-    address public immutable ASSET;  //Settlement Asset
-    address public immutable TOKEN;  //Paired Token
+    address public  ASSET;  //Settlement Asset
+    address public  TOKEN;  //Paired Token
     address public immutable FACTORY;
     mapping(address => uint) private _balances;
     mapping(address => mapping(address => uint)) private _allowances;
     
+    
    
-    constructor (address _asset, address _token) {
-        ASSET = _asset;
-        TOKEN = _token;
+    constructor () {
         FACTORY = msg.sender;
+    }
+
+    // called once by the factory at time of deployment
+    function initialize(address _token0, address _token1) external {
+        require(msg.sender == FACTORY, 'SPARTANPROTOCOL: FORBIDDEN'); // sufficient check
+        ASSET = _token0;
+        TOKEN = _token1;
         string memory poolName = "-SpartanProtocolPool";
         string memory poolSymbol = "-SPP";
         string memory slash = "/";
-        _name = string(abi.encodePacked(iBEP20(_asset).name(), slash, iBEP20(_token).name(), poolName));
-        _symbol = string(abi.encodePacked(iBEP20(_asset).name(), slash, iBEP20(_token).name(), poolSymbol));
+        _name = string(abi.encodePacked(iBEP20(_token0).name(), slash, iBEP20(_token0).name(), poolName));
+        _symbol = string(abi.encodePacked(iBEP20(_token1).name(), slash, iBEP20(_token1).name(), poolSymbol));
         decimals = 18;
         genesis = block.timestamp;
     }
+
+
 
     //========================================IBEP20=========================================//
 
@@ -288,6 +298,17 @@ contract SPARTANPROTCOLPOOL is iBEP20 {
             _actual = 0;
         }
         return _actual;
+    }
+
+    function getReserves() public view returns (uint256 _tokenDepth, uint256 _assetDepth, uint256 _blockTimestampLast) {
+        _tokenDepth = tokenDepth;
+        _assetDepth = assetDepth;
+        _blockTimestampLast = block.timestamp;
+    }
+
+    function _safeTransfer(address token, address to, uint value) private {
+        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(SELECTOR, to, value));
+        require(success && (data.length == 0 || abi.decode(data, (bool))), 'Pancake: TRANSFER_FAILED');
     }
 
    
