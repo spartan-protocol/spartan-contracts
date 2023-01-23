@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
   "contractName": "iHANDLER",
-  "sourceName": "contracts/iHANDLER.sol",
+  "sourceName": "contracts/Interfaces/iHANDLER.sol",
   "abi": [
     {
       "inputs": [],
@@ -32,19 +32,6 @@
     {
       "inputs": [],
       "name": "RESERVE",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "ROUTER",
       "outputs": [
         {
           "internalType": "address",

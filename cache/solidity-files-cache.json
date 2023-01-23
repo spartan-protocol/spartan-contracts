@@ -37,8 +37,8 @@
       ]
     },
     "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\Sparta.sol": {
-      "lastModificationDate": 1672833527914,
-      "contentHash": "ccb5f3704ffc4d3563d64d959b67bde9",
+      "lastModificationDate": 1674125428042,
+      "contentHash": "dd072531bb77ae8e50127273cba8f709",
       "sourceName": "contracts/Sparta.sol",
       "solcConfig": {
         "version": "0.8.9",
@@ -65,86 +65,13 @@
       },
       "imports": [
         "./BSC-Library/iBEP20.sol",
-        "./iHANDLER.sol"
+        "./Interfaces/iHANDLER.sol"
       ],
       "versionPragmas": [
         "^0.8.9"
       ],
       "artifacts": [
         "Sparta"
-      ]
-    },
-    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\iHANDLER.sol": {
-      "lastModificationDate": 1672831064479,
-      "contentHash": "c250c78e4721ebc671df1bf3837609de",
-      "sourceName": "contracts/iHANDLER.sol",
-      "solcConfig": {
-        "version": "0.8.9",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.9"
-      ],
-      "artifacts": [
-        "iHANDLER"
-      ]
-    },
-    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\Pool.sol": {
-      "lastModificationDate": 1672833493618,
-      "contentHash": "1134b8ac8041e0ef230cbe2d70729438",
-      "sourceName": "contracts/Pool.sol",
-      "solcConfig": {
-        "version": "0.8.9",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "./BSC-Library/iBEP20.sol",
-        "@openzeppelin/contracts/utils/math/SafeMath.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.9"
-      ],
-      "artifacts": [
-        "Pool"
       ]
     },
     "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\node_modules\\@openzeppelin\\contracts\\utils\\math\\SafeMath.sol": {
@@ -289,6 +216,511 @@
       ],
       "artifacts": [
         "TOOLS"
+      ]
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\Interfaces\\iHANDLER.sol": {
+      "lastModificationDate": 1673521921815,
+      "contentHash": "a5221ea2030865daa5ac8a8bf6af68d3",
+      "sourceName": "contracts/Interfaces/iHANDLER.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.9"
+      ],
+      "artifacts": [
+        "iHANDLER"
+      ]
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\poolFactory.sol": {
+      "lastModificationDate": 1674480100796,
+      "contentHash": "e3e644c813a754a719001c6fb783e1fd",
+      "sourceName": "contracts/poolFactory.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./Interfaces/iSPARTANPROTOCOLPOOL.sol",
+        "./SPARTANPROTOCOLPOOL.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.9"
+      ],
+      "artifacts": [
+        "PoolFactory"
+      ]
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\HANDLER.sol": {
+      "lastModificationDate": 1673002957122,
+      "contentHash": "d00840ecf046422f19a19aa8429f98e0",
+      "sourceName": "contracts/HANDLER.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./Interfaces/iPOOLFACTORY.sol",
+        "./Interfaces/iTOOLS.sol",
+        "./Interfaces/iRESERVE.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.9"
+      ],
+      "artifacts": [
+        "HANDLER"
+      ]
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\Interfaces\\iPOOLFACTORY.sol": {
+      "lastModificationDate": 1673002020290,
+      "contentHash": "4a6c4be741b5eb97163fae85ecd99ad0",
+      "sourceName": "contracts/Interfaces/iPOOLFACTORY.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.8.9"
+      ],
+      "artifacts": [
+        "iPOOLFACTORY"
+      ]
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\Interfaces\\iTOOLS.sol": {
+      "lastModificationDate": 1673002039089,
+      "contentHash": "e3f504818f8495afd00ee8e7c2f9a9d2",
+      "sourceName": "contracts/Interfaces/iTOOLS.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.8.9"
+      ],
+      "artifacts": [
+        "iTOOLS"
+      ]
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\Interfaces\\iRESERVE.sol": {
+      "lastModificationDate": 1673002758403,
+      "contentHash": "27ad5dbf8cec96d7b1c5ba509218e612",
+      "sourceName": "contracts/Interfaces/iRESERVE.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.8.9"
+      ],
+      "artifacts": [
+        "iRESERVE"
+      ]
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\UTILS\\MockBEP20.sol": {
+      "lastModificationDate": 1674480145716,
+      "contentHash": "d5270c781bb3e87b3186047e64b10926",
+      "sourceName": "contracts/UTILS/MockBEP20.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/ERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.9"
+      ],
+      "artifacts": [
+        "MockBEP20"
+      ]
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol": {
+      "lastModificationDate": 1674477617253,
+      "contentHash": "834a0dde221759af42b030253315b086",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC20.sol",
+        "./extensions/IERC20Metadata.sol",
+        "../../utils/Context.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ERC20"
+      ]
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\node_modules\\@openzeppelin\\contracts\\utils\\Context.sol": {
+      "lastModificationDate": 1674477617221,
+      "contentHash": "5f2c5c4b6af2dd4551027144797bc8be",
+      "sourceName": "@openzeppelin/contracts/utils/Context.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Context"
+      ]
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\IERC20.sol": {
+      "lastModificationDate": 1674477617309,
+      "contentHash": "ad7c2d0af148c8f9f097d65deeb4da6b",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\extensions\\IERC20Metadata.sol": {
+      "lastModificationDate": 1674477617311,
+      "contentHash": "909ab67fc5c25033fe6cd364f8c056f9",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC20Metadata"
+      ]
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\UTILS\\spartaV2.sol": {
+      "lastModificationDate": 1674479236819,
+      "contentHash": "d41d8cd98f00b204e9800998ecf8427e",
+      "sourceName": "contracts/UTILS/spartaV2.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [],
+      "artifacts": []
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\SPARTANPROTOCOLPOOL.sol": {
+      "lastModificationDate": 1674480091417,
+      "contentHash": "338fda31b06127d5e361fa5f2ddf5155",
+      "sourceName": "contracts/SPARTANPROTOCOLPOOL.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./BSC-Library/iBEP20.sol",
+        "./Interfaces/iHANDLER.sol",
+        "@openzeppelin/contracts/utils/math/SafeMath.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.9"
+      ],
+      "artifacts": [
+        "SPARTANPROTOCOLPOOL"
+      ]
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\Interfaces\\iSPARTANPROTOCOLPOOL.sol": {
+      "lastModificationDate": 1674479988663,
+      "contentHash": "1d1ada427a8187c0e7fc99cda4acc54f",
+      "sourceName": "contracts/Interfaces/iSPARTANPROTOCOLPOOL.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.8.9"
+      ],
+      "artifacts": [
+        "ISPARTANPROTOCOLPOOL"
       ]
     }
   }

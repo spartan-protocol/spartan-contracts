@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
-import './Interfaces/iSPARTANPROTCOLPOOL.sol';
-import './SPARTANPROTCOLPOOL.sol';
+import './Interfaces/iSPARTANPROTOCOLPOOL.sol';
+import './SPARTANPROTOCOLPOOL.sol';
 
 contract PoolFactory  { 
     address private immutable WBNB;  // Address of WBNB
@@ -23,15 +23,12 @@ contract PoolFactory  {
             token0 = WBNB; //Handle BNB
         }
         require(getPool[token0][token1] == address(0), "SpartanProtocalPool: POOL_EXISTS");
-        // SPARTANPROTCOLPOOL newPool;
-        // newPool = new SPARTANPROTCOLPOOL(token0, token1); // Deploy new pool 
-        // pool = address(newPool); // Get address of new pool
-        bytes memory bytecode = type(SPARTANPROTCOLPOOL).creationCode;
+        bytes memory bytecode = type(SPARTANPROTOCOLPOOL).creationCode; 
         bytes32 salt = keccak256(abi.encodePacked(token0, token1));
-        assembly {
+        assembly { 
             pool := create2(0, add(bytecode, 32), mload(bytecode), salt)
         }
-        ISPARTANPROTCOLPOOL(pool).initialize(token0, token1);
+        ISPARTANPROTOCOLPOOL(pool).initialize(token0, token1);
         getPool[token0][token1] = pool; 
         getPool[token1][token0] = pool; // populate mapping in the reverse direction
         _handleTransferIn(tokenA, inputA, pool); // Transfer TOKEN liquidity to new pool

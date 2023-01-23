@@ -1,6 +1,7 @@
 {
   "name": "hardhat-project",
   "dependencies": {
+    "ethers-utils": "^2.1.11",
     "truffle": "^5.7.1"
   },
   "devDependencies": {

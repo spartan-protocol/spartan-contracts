@@ -4,7 +4,7 @@ import "./BSC-Library/iBEP20.sol";
 import "./Interfaces/iHANDLER.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-contract SPARTANPROTCOLPOOL is iBEP20 {  
+contract SPARTANPROTOCOLPOOL is iBEP20 {  
     using SafeMath for uint256;
 
     uint public constant MINIMUM_LIQUIDITY = 10**3;
@@ -38,8 +38,8 @@ contract SPARTANPROTCOLPOOL is iBEP20 {
         string memory poolName = "-SpartanProtocolPool";
         string memory poolSymbol = "-SPP";
         string memory slash = "/";
-        _name = string(abi.encodePacked(iBEP20(_token0).name(), slash, iBEP20(_token0).name(), poolName));
-        _symbol = string(abi.encodePacked(iBEP20(_token1).name(), slash, iBEP20(_token1).name(), poolSymbol));
+        _name = string(abi.encodePacked(iBEP20(_token0).name(), slash, iBEP20(_token1).name(), poolName));
+        _symbol = string(abi.encodePacked(iBEP20(_token0).name(), slash, iBEP20(_token1).name(), poolSymbol));
         decimals = 18;
         genesis = block.timestamp;
     }
