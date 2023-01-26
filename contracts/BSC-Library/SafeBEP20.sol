@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "./iBEP20.sol"; 
+import "./IBEP20.sol"; 
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
@@ -19,7 +19,7 @@ library SafeBEP20 {
   using Address for address;
 
   function safeTransfer(
-    iBEP20 token,
+    IBEP20 token,
     address to,
     uint256 value
   ) internal {
@@ -30,7 +30,7 @@ library SafeBEP20 {
   }
 
   function safeTransferFrom(
-    iBEP20 token,
+    IBEP20 token,
     address from,
     address to,
     uint256 value
@@ -49,7 +49,7 @@ library SafeBEP20 {
    * {safeDecreaseAllowance} instead.
    */
   function safeApprove(
-    iBEP20 token,
+    IBEP20 token,
     address spender,
     uint256 value
   ) internal {
@@ -68,7 +68,7 @@ library SafeBEP20 {
   }
 
   function safeIncreaseAllowance(
-    iBEP20 token,
+    IBEP20 token,
     address spender,
     uint256 value
   ) internal {
@@ -80,7 +80,7 @@ library SafeBEP20 {
   }
 
   function safeDecreaseAllowance(
-    iBEP20 token,
+    IBEP20 token,
     address spender,
     uint256 value
   ) internal {
@@ -101,7 +101,7 @@ library SafeBEP20 {
    * @param token The token targeted by the call.
    * @param data The call data (encoded using abi.encode or one of its variants).
    */
-  function _callOptionalReturn(iBEP20 token, bytes memory data) private {
+  function _callOptionalReturn(IBEP20 token, bytes memory data) private {
     // We need to perform a low level call here, to bypass Solidity's return data size checking mechanism, since
     // we're implementing it ourselves. We use {Address.functionCall} to perform this call, which verifies that
     // the target address contains contract code and also asserts for success in the low-level call.

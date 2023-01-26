@@ -44,9 +44,9 @@ contract POOLFACTORY  {
             require(_amount == msg.value);
             (bool success, ) = payable(WBNB).call{value: _amount}(""); // Wrap BNB
             require(success);
-            iBEP20(WBNB).transfer(_pool, _amount); // Tsf WBNB (PoolFactory -> Pool)
+            IBEP20(WBNB).transfer(_pool, _amount); // Tsf WBNB (PoolFactory -> Pool)
         } else {
-            require(iBEP20(_token).transferFrom(msg.sender, _pool, _amount)); // Tsf TOKEN (User -> Pool)
+            require(IBEP20(_token).transferFrom(msg.sender, _pool, _amount)); // Tsf TOKEN (User -> Pool)
         }
     }
 

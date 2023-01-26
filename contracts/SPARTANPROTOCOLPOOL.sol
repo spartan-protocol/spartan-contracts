@@ -1,10 +1,10 @@
 //SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
-import "./BSC-Library/iBEP20.sol";
+import "./BSC-Library/IBEP20.sol";
 import "./Interfaces/iHANDLER.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol"; 
 
-contract SPARTANPROTOCOLPOOL is iBEP20 {  
+contract SPARTANPROTOCOLPOOL is IBEP20 {  
     using SafeMath for uint256;
 
     uint public constant MINIMUM_LIQUIDITY = 10**3;
@@ -38,8 +38,8 @@ contract SPARTANPROTOCOLPOOL is iBEP20 {
         string memory poolName = "-SpartanProtocolPool";
         string memory poolSymbol = "-SPP";
         string memory slash = "/";
-        _name = string(abi.encodePacked(iBEP20(_token0).name(), slash, iBEP20(_token1).name(), poolName));
-        _symbol = string(abi.encodePacked(iBEP20(_token0).name(), slash, iBEP20(_token1).name(), poolSymbol));
+        _name = string(abi.encodePacked(IBEP20(_token0).name(), slash, IBEP20(_token1).name(), poolName));
+        _symbol = string(abi.encodePacked(IBEP20(_token0).name(), slash, IBEP20(_token1).name(), poolSymbol));
         decimals = 18;
         genesis = block.timestamp;
     }
@@ -280,7 +280,7 @@ contract SPARTANPROTOCOLPOOL is iBEP20 {
 
      // Check the ASSET amount received by this Pool
     function _checkAssetDepth() internal view returns(uint256 _actual){
-        uint _assetBalance = iBEP20(ASSET).balanceOf(address(this));
+        uint _assetBalance = IBEP20(ASSET).balanceOf(address(this));
         if(_assetBalance > assetDepth){
             _actual = _assetBalance - assetDepth;
         } else {
@@ -291,7 +291,7 @@ contract SPARTANPROTOCOLPOOL is iBEP20 {
 
       // Check the TOKEN amount received by this Pool
     function _checkTokenDepth() internal view returns(uint256 _actual){
-        uint _tokenBalance = iBEP20(TOKEN).balanceOf(address(this)); 
+        uint _tokenBalance = IBEP20(TOKEN).balanceOf(address(this)); 
         if(_tokenBalance > tokenDepth){
             _actual = _tokenBalance - tokenDepth;
         } else {

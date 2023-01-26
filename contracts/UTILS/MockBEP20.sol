@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
-import "contracts/BSC-Library/iBEP20.sol";
+import "contracts/BSC-Library/IBEP20.sol";
 
 
     //======================================SPARTA=========================================//
-contract MockBEP20 is iBEP20 {
+contract MockBEP20 is IBEP20 {
    // BEP-20 Mappings
    string public override name;
     string public override symbol;
