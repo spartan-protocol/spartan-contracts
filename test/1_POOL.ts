@@ -56,11 +56,11 @@ contract('SPARTAN_PROTOCOL_POOL_FUNCTIONS', ([Depp, Paper, Scissors, John, Sumas
 
 
       // TESTING STARTS HERE 
-      baseParams()
+      deploySparta()
 
 })
 
-async function baseParams(){
+async function deploySparta(){
   it("Should deploy SPARTA", async function() {
       expect(await SP.name()).to.equal("Spartan Protocol AGIS");
       expect(await SP.symbol()).to.equal("SP");
