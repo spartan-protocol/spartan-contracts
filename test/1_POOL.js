@@ -1,4 +1,5 @@
-const assert = require("chai").assert;
+const { assert, expect } = require("chai");
+const { ethers } = require("hardhat");
 
 const SPARTA = artifacts.require("./Sparta.sol");
 const poolFactory = artifacts.require("./PoolFactory.sol");
@@ -43,6 +44,7 @@ contract('SPARTANPROTOCOL_POOL_FUNCTIONS', ([Depp, Paper, Scissors, John, Sumas,
      
   
 })
+
 
 
 
