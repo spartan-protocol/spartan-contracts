@@ -2,6 +2,7 @@
 pragma solidity ^0.8.9;
 import "./BSC-Library/iBEP20.sol";
 import "./Interfaces/iHANDLER.sol";
+import "hardhat/console.sol";
 
     //======================================SPARTA=========================================//
 contract SPARTA is iBEP20 {
@@ -195,7 +196,7 @@ contract SPARTA is iBEP20 {
     //==========================================Minting============================================//
     function migrate() external {
         uint amount = iBEP20(BASEv2).balanceOf(msg.sender); //Get balance of sender
-        require(iBEP20(address(this)).allowance(msg.sender, address(this)) > amount, "ALLOWANCE");  //Check allowance 
+        require(iBEP20(BASEv2).allowance(msg.sender, address(this)) >= amount, "ALLOWANCE");  //Check allowance 
         require(iBEP20(BASEv2).transferFrom(msg.sender, address(this), amount)); //Transfer balance from sender
         iBEP20(BASEv2).burn(amount); //burn balance 
         _mint(msg.sender, amount); // 1:1

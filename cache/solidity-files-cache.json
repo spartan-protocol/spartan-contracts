@@ -220,8 +220,8 @@
       ]
     },
     "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\SPARTA.sol": {
-      "lastModificationDate": 1674735204481,
-      "contentHash": "1ec844fd8b4ef0b4c5c3e0beeb85808c",
+      "lastModificationDate": 1674739171198,
+      "contentHash": "a575b32b39746468bc6ef21c6d1b4528",
       "sourceName": "contracts/SPARTA.sol",
       "solcConfig": {
         "version": "0.8.9",
@@ -248,7 +248,8 @@
       },
       "imports": [
         "./BSC-Library/iBEP20.sol",
-        "./Interfaces/iHANDLER.sol"
+        "./Interfaces/iHANDLER.sol",
+        "hardhat/console.sol"
       ],
       "versionPragmas": [
         "^0.8.9"
@@ -545,8 +546,8 @@
       ]
     },
     "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\UTILS\\MockBEP20.sol": {
-      "lastModificationDate": 1674480145716,
-      "contentHash": "d5270c781bb3e87b3186047e64b10926",
+      "lastModificationDate": 1674738708495,
+      "contentHash": "62226086bea18c067642883eccb0d05d",
       "sourceName": "contracts/UTILS/MockBEP20.sol",
       "solcConfig": {
         "version": "0.8.9",
@@ -572,7 +573,7 @@
         }
       },
       "imports": [
-        "@openzeppelin/contracts/token/ERC20/ERC20.sol"
+        "contracts/BSC-Library/iBEP20.sol"
       ],
       "versionPragmas": [
         "^0.8.9"
@@ -760,6 +761,41 @@
       ],
       "artifacts": [
         "WBNB"
+      ]
+    },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\node_modules\\hardhat\\console.sol": {
+      "lastModificationDate": 1674477616993,
+      "contentHash": "4ff3cd2f6272c9a6516e9ee4f2b967d3",
+      "sourceName": "hardhat/console.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">= 0.4.22 <0.9.0"
+      ],
+      "artifacts": [
+        "console"
       ]
     }
   }

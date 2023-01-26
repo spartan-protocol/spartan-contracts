@@ -9,7 +9,7 @@ const Handler = artifacts.require("./HANDLER.sol");
 const Tools = artifacts.require("./TOOLS.sol");
 const poolFactory = artifacts.require("./POOLFACTORY.sol");
 const pool = artifacts.require("./SPARTANPROTOCOLPOOL.sol");
-const MockERC20 = artifacts.require("./UTILS/MockBEP20.sol");
+const MockBEP20 = artifacts.require("./UTILS/MockBEP20.sol");
 const WrappedBNB = artifacts.require("./UTILS/WBNB.sol");
 const reserve = artifacts.require("./RESERVE.sol");
 
@@ -27,7 +27,7 @@ contract('SPARTAN_PROTOCOL_POOL_FUNCTIONS', ([Depp, Paper, Scissors, John, Sumas
         // Deploy Wrapped BNB
         WBNB = await WrappedBNB.new();
         // Deploy mockSparta token 
-        oldSparta = await MockERC20.new("Sparta", "SPAARTA", parseEther("10000000"), { from: Depp });
+        oldSparta = await MockBEP20.new("Sparta", "SPAARTA", parseEther("10000000"), { from: Depp });
         // Deploy New Sparta as $SP
         SP = await Sparta.new(oldSparta.address)
         // Deploy HANDLER 
@@ -37,9 +37,9 @@ contract('SPARTAN_PROTOCOL_POOL_FUNCTIONS', ([Depp, Paper, Scissors, John, Sumas
         // Deploy RESERVE 
         spReserve = await reserve.new(SP.address)     
         // Deploy mock BEP20s
-        tokenA = await MockERC20.new("Token A", "TA", parseEther("10000000"), { from: Depp });
-        tokenB = await MockERC20.new("Token B", "TB", parseEther("10000000"), { from: Depp });
-        tokenC = await MockERC20.new("Token C", "TC", parseEther("10000000"), { from: Depp });
+        tokenA = await MockBEP20.new("Token A", "TA", parseEther("10000000"), { from: Depp });
+        tokenB = await MockBEP20.new("Token B", "TB", parseEther("10000000"), { from: Depp });
+        tokenC = await MockBEP20.new("Token C", "TC", parseEther("10"), { from: Depp });
 
         //Initiate Handler's addreses
         await spHandler.setGenesisAddresses(spTools.address, spReserve.address, spFactory.address, {from:Depp});
@@ -50,6 +50,8 @@ contract('SPARTAN_PROTOCOL_POOL_FUNCTIONS', ([Depp, Paper, Scissors, John, Sumas
             await tokenA.mintTokens(parseEther("2000000"), { from: thisUser });
             await tokenB.mintTokens(parseEther("2000000"), { from: thisUser });
             await tokenC.mintTokens(parseEther("2000000"), { from: thisUser });
+            await oldSparta.mintTokens(parseEther("2000000"), { from: thisUser });
+            await oldSparta.approve(SP.address, constants.MAX_UINT256, {from: thisUser})
            }
       });
 
@@ -57,6 +59,7 @@ contract('SPARTAN_PROTOCOL_POOL_FUNCTIONS', ([Depp, Paper, Scissors, John, Sumas
 
       // TESTING STARTS HERE 
       deploySparta()
+      upgradeSparta(Depp)
 
 })
 
@@ -72,6 +75,18 @@ async function deploySparta(){
       expect(await SP.HANDLER()).to.equal(spHandler.address);
       expect(String(await SP.getDailyEmission())).to.equal(parseEther('0').toString());
     });
+}
+
+async function upgradeSparta(acc) {
+    it("It should upgrade sparta v2 - v3", async () => {
+        let balance = String(await oldSparta.balanceOf(acc));
+        let sbalance = String(await SP.balanceOf(acc));
+        await SP.migrate({from:acc});
+        let balanceA = String(await oldSparta.balanceOf(acc));
+        let sbalanceA = String(await SP.balanceOf(acc));
+        assert.equal(String(balanceA), String(sbalance))
+        assert.equal(String(balance), String(sbalanceA))
+    })
 }
 
 
