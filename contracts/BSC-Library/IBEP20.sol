@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-interface iBEP20 {
+interface IBEP20 {
     /**
      * @dev Returns the amount of tokens in existence.
      */
