@@ -29,6 +29,5 @@ jobs:
           node-version: '18.x'
       - run: yarn --ignore-scripts
         shell: bash
-      - name: Create local node and deploy
       - name: Run Tests
         run: yarn hardhat test
