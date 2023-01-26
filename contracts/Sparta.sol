@@ -4,7 +4,7 @@ import "./BSC-Library/iBEP20.sol";
 import "./Interfaces/iHANDLER.sol";
 
     //======================================SPARTA=========================================//
-contract Sparta is iBEP20 {
+contract SPARTA is iBEP20 {
     // BEP-20 Parameters
     string public constant override name = 'Spartan Protocol AGIS';
     string public constant override symbol = 'SP';
@@ -47,9 +47,9 @@ contract Sparta is iBEP20 {
         secondsPerEra =  86400; // 1 day
         nextEraTime = block.timestamp + secondsPerEra;
         DEPLOYER = msg.sender;
-         _balances[msg.sender] = 1 * 10**7 * 10**decimals;     // TestHelper Only!!!
-         totalSupply = 1 * 10**6 * 10**decimals;               // TestHelper Only!!!
-        emit Transfer(address(0), msg.sender, totalSupply);    // TestHelper Only!!!
+        //  _balances[msg.sender] = 1 * 10**7 * 10**decimals;     // TestHelper Only!!!
+        //  totalSupply = 1 * 10**6 * 10**decimals;               // TestHelper Only!!!
+        // emit Transfer(address(0), msg.sender, totalSupply);    // TestHelper Only!!!
     }
 
     //========================================iBEP20=========================================//

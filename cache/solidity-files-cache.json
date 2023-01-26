@@ -37,8 +37,8 @@
       ]
     },
     "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\SPARTANPROTOCOLPOOL.sol": {
-      "lastModificationDate": 1674480091417,
-      "contentHash": "338fda31b06127d5e361fa5f2ddf5155",
+      "lastModificationDate": 1674731018665,
+      "contentHash": "7402534f47de7a47b2cad5af111dec6f",
       "sourceName": "contracts/SPARTANPROTOCOLPOOL.sol",
       "solcConfig": {
         "version": "0.8.9",
@@ -110,8 +110,8 @@
         "iHANDLER"
       ]
     },
-    "C:\\Users\\User\\node_modules\\@openzeppelin\\contracts\\utils\\math\\SafeMath.sol": {
-      "lastModificationDate": 1651054702396,
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\node_modules\\@openzeppelin\\contracts\\utils\\math\\SafeMath.sol": {
+      "lastModificationDate": 1674477617350,
       "contentHash": "2337f0279507b5edf14a07067adf0d05",
       "sourceName": "@openzeppelin/contracts/utils/math/SafeMath.sol",
       "solcConfig": {
@@ -184,9 +184,9 @@
         "SafeBEP20"
       ]
     },
-    "C:\\Users\\User\\node_modules\\@openzeppelin\\contracts\\utils\\Address.sol": {
-      "lastModificationDate": 1651054702329,
-      "contentHash": "ad714a6368ee7d43cded6bbe8af0b155",
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\node_modules\\@openzeppelin\\contracts\\utils\\Address.sol": {
+      "lastModificationDate": 1674477617215,
+      "contentHash": "f31ad6fc4bbf9c06203987220156a6ba",
       "sourceName": "@openzeppelin/contracts/utils/Address.sol",
       "solcConfig": {
         "version": "0.8.9",
@@ -219,10 +219,10 @@
         "Address"
       ]
     },
-    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\Sparta.sol": {
-      "lastModificationDate": 1674125428042,
-      "contentHash": "dd072531bb77ae8e50127273cba8f709",
-      "sourceName": "contracts/Sparta.sol",
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\SPARTA.sol": {
+      "lastModificationDate": 1674735204481,
+      "contentHash": "1ec844fd8b4ef0b4c5c3e0beeb85808c",
+      "sourceName": "contracts/SPARTA.sol",
       "solcConfig": {
         "version": "0.8.9",
         "settings": {
@@ -254,13 +254,13 @@
         "^0.8.9"
       ],
       "artifacts": [
-        "Sparta"
+        "SPARTA"
       ]
     },
-    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\poolFactory.sol": {
-      "lastModificationDate": 1674480100796,
-      "contentHash": "e3e644c813a754a719001c6fb783e1fd",
-      "sourceName": "contracts/poolFactory.sol",
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\poolFACTORY.sol": {
+      "lastModificationDate": 1674731710140,
+      "contentHash": "a34109cb1a3b6cd0c8824a7813b69f35",
+      "sourceName": "contracts/poolFACTORY.sol",
       "solcConfig": {
         "version": "0.8.9",
         "settings": {
@@ -292,7 +292,7 @@
         "^0.8.9"
       ],
       "artifacts": [
-        "PoolFactory"
+        "POOLFACTORY"
       ]
     },
     "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\Interfaces\\iSPARTANPROTOCOLPOOL.sol": {
@@ -474,6 +474,41 @@
         "iRESERVE"
       ]
     },
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\RESERVE.sol": {
+      "lastModificationDate": 1674731052077,
+      "contentHash": "f742ed198951659a5c5ccde18a57a838",
+      "sourceName": "contracts/RESERVE.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.8.9"
+      ],
+      "artifacts": [
+        "RESERVE"
+      ]
+    },
     "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\contracts\\TOOLS.sol": {
       "lastModificationDate": 1674726267469,
       "contentHash": "a1cfb175a24970fd0e3c344a33bcbf16",
@@ -546,9 +581,9 @@
         "MockBEP20"
       ]
     },
-    "C:\\Users\\User\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol": {
-      "lastModificationDate": 1651054702346,
-      "contentHash": "a9d2146925da52142435d3bb8df53c3c",
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol": {
+      "lastModificationDate": 1674477617253,
+      "contentHash": "834a0dde221759af42b030253315b086",
       "sourceName": "@openzeppelin/contracts/token/ERC20/ERC20.sol",
       "solcConfig": {
         "version": "0.8.9",
@@ -585,8 +620,8 @@
         "ERC20"
       ]
     },
-    "C:\\Users\\User\\node_modules\\@openzeppelin\\contracts\\utils\\Context.sol": {
-      "lastModificationDate": 1651054702332,
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\node_modules\\@openzeppelin\\contracts\\utils\\Context.sol": {
+      "lastModificationDate": 1674477617221,
       "contentHash": "5f2c5c4b6af2dd4551027144797bc8be",
       "sourceName": "@openzeppelin/contracts/utils/Context.sol",
       "solcConfig": {
@@ -620,8 +655,8 @@
         "Context"
       ]
     },
-    "C:\\Users\\User\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\IERC20.sol": {
-      "lastModificationDate": 1651054702378,
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\IERC20.sol": {
+      "lastModificationDate": 1674477617309,
       "contentHash": "ad7c2d0af148c8f9f097d65deeb4da6b",
       "sourceName": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
       "solcConfig": {
@@ -655,8 +690,8 @@
         "IERC20"
       ]
     },
-    "C:\\Users\\User\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\extensions\\IERC20Metadata.sol": {
-      "lastModificationDate": 1651054702378,
+    "C:\\Users\\User\\Documents\\SpartaDev\\spartan-contracts\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\extensions\\IERC20Metadata.sol": {
+      "lastModificationDate": 1674477617311,
       "contentHash": "909ab67fc5c25033fe6cd364f8c056f9",
       "sourceName": "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
       "solcConfig": {

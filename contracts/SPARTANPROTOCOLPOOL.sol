@@ -2,7 +2,7 @@
 pragma solidity ^0.8.9;
 import "./BSC-Library/iBEP20.sol";
 import "./Interfaces/iHANDLER.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol"; 
 
 contract SPARTANPROTOCOLPOOL is iBEP20 {  
     using SafeMath for uint256;
@@ -12,7 +12,7 @@ contract SPARTANPROTOCOLPOOL is iBEP20 {
     
     string private _name;                                                 
     string private _symbol;
-    uint128 private tokenDepth;           
+    uint128 private tokenDepth;            
     uint128 private assetDepth;           
     
     uint8 public override  decimals;                              

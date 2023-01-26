@@ -3,7 +3,7 @@ pragma solidity ^0.8.9;
 import './Interfaces/iSPARTANPROTOCOLPOOL.sol';
 import './SPARTANPROTOCOLPOOL.sol';
 
-contract PoolFactory  { 
+contract POOLFACTORY  { 
     address private immutable WBNB;  // Address of WBNB
     
     mapping(address=> mapping(address => address)) public getPool;
