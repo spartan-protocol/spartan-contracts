@@ -3,6 +3,9 @@ import { formatUnits, parseEther } from "ethers/lib/utils";
 import { artifacts, contract } from "hardhat";
 import { assert, expect } from "chai";
 import { BN, constants, expectEvent, expectRevert, time } from "@openzeppelin/test-helpers";
+const { ethers } = require("hardhat");
+var BigNumber = require('bignumber.js');
+const _ = require('./utils.js');
 
 const Sparta = artifacts.require("./SPARTA.sol");
 const Handler = artifacts.require("./HANDLER.sol");
@@ -52,6 +55,12 @@ contract('SPARTAN_PROTOCOL_POOL_FUNCTIONS', ([Depp, Paper, Scissors, John, Sumas
             await tokenC.mintTokens(parseEther("2000000"), { from: thisUser });
             await oldSparta.mintTokens(parseEther("2000000"), { from: thisUser });
             await oldSparta.approve(SP.address, constants.MAX_UINT256, {from: thisUser})
+            await tokenA.approve(SP.address, constants.MAX_UINT256, {from: thisUser})
+            await tokenB.approve(SP.address, constants.MAX_UINT256, {from: thisUser})
+            await tokenC.approve(SP.address, constants.MAX_UINT256, {from: thisUser})
+            await tokenA.approve(spFactory.address, constants.MAX_UINT256, {from: thisUser})
+            await tokenB.approve(spFactory.address, constants.MAX_UINT256, {from: thisUser})
+            await tokenC.approve(spFactory.address, constants.MAX_UINT256, {from: thisUser})
            }
       });
 
@@ -60,6 +69,7 @@ contract('SPARTAN_PROTOCOL_POOL_FUNCTIONS', ([Depp, Paper, Scissors, John, Sumas
       // TESTING STARTS HERE 
       deploySparta()
       upgradeSparta(Depp)
+      createPool(John)
 
 })
 
@@ -88,6 +98,28 @@ async function upgradeSparta(acc) {
         assert.equal(String(balance), String(sbalanceA))
     })
 }
+
+
+async function createPool(acc){
+    it("should create a pool", async function() {
+        let inputA = parseEther("100");
+        let inputB = parseEther("110");
+        var initialLength = _.getBN(await spFactory.allPoolsLength());
+        var _pool = await spFactory.createPool.call(inputA, inputB, tokenA.address,tokenB.address)
+        await spFactory.createPool(inputA, inputB, tokenA.address, tokenB.address, {from:acc});
+        var poolAddress = await pool.at(_pool);
+        let values = [tokenA.address, tokenB.address];
+        let [token0,token1] = values.sort((a,b) =>  (a > b ? 1 : -1));
+        expect(await poolAddress.ASSET()).to.equal(token0);
+        expect(await poolAddress.TOKEN()).to.equal(token1);
+        const newLength = await spFactory.allPoolsLength();
+        assert.equal(String(newLength), _.BN2Str(initialLength.plus(1)));
+    });
+}
+
+
+    
+
 
 
 
