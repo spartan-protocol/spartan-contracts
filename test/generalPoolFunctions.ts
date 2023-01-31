@@ -36,7 +36,7 @@ let spFactory;
 let oldSparta;
 
 contract(
-  "SPARTAN_PROTOCOL_POOL_FUNCTIONS",
+  "General Pool Functions",
   ([Depp, Paper, Scissors, John, Sumas, Yfirev, Tsrif, ...accounts]) => {
     // SET UP CONTRACT FILES
 
