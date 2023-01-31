@@ -12,14 +12,14 @@ const { ethers } = require("hardhat");
 var BigNumber = require("bignumber.js");
 const _ = require("./utils.js");
 
-const Sparta = artifacts.require("./SPARTA.sol");
-const Handler = artifacts.require("./HANDLER.sol");
-const Tools = artifacts.require("./TOOLS.sol");
-const poolFactory = artifacts.require("./POOLFACTORY.sol");
-const pool = artifacts.require("./SPARTANPROTOCOLPOOL.sol");
+const Sparta = artifacts.require("./Sparta.sol");
+const Handler = artifacts.require("./Handler.sol");
+const Tools = artifacts.require("./Tools.sol");
+const PoolFactory = artifacts.require("./PoolFactory.sol");
+const Pool = artifacts.require("./Pool.sol");
 const MockBEP20 = artifacts.require("./UTILS/MockBEP20.sol");
 const WrappedBNB = artifacts.require("./UTILS/WBNB.sol");
-const reserve = artifacts.require("./RESERVE.sol");
+const Reserve = artifacts.require("./Reserve.sol");
 
 let poolAB;
 let poolSB;
@@ -42,7 +42,7 @@ contract(
 
     before(async () => {
       // Deploy Factory
-      spFactory = await poolFactory.new(Depp, { from: Depp });
+      spFactory = await PoolFactory.new(Depp, { from: Depp });
       // Deploy Wrapped BNB
       WBNB = await WrappedBNB.new();
       // Deploy mockSparta token
@@ -59,7 +59,7 @@ contract(
       // Deploy TOOLS
       spTools = await Tools.new();
       // Deploy RESERVE
-      spReserve = await reserve.new(SP.address);
+      spReserve = await Reserve.new(SP.address);
       // Deploy mock BEP20s
       tokenA = await MockBEP20.new("Token A", "TA", parseEther("10000000"), {
         from: Depp,
@@ -78,7 +78,7 @@ contract(
         spFactory.address,
         { from: Depp }
       );
-      await SP.changeHANDLER(spHandler.address);
+      await SP.changeHandler(spHandler.address);
 
       // Mint tokens
       for (let thisUser of [
@@ -127,7 +127,7 @@ contract(
 
 async function deploySparta() {
   it("Should deploy SPARTA", async function () {
-    expect(await SP.name()).to.equal("Spartan Protocol AGIS");
+    expect(await SP.name()).to.equal("Spartan Protocol Ecosystem Token");
     expect(await SP.symbol()).to.equal("SP");
     expect(String(await SP.decimals())).to.equal("18");
     expect(String(await SP.totalSupply())).to.equal("0");
@@ -136,7 +136,7 @@ async function deploySparta() {
     );
     expect(String(await SP.emissionCurve())).to.equal("2048");
     expect(await SP.emitting()).to.equal(false);
-    expect(await SP.HANDLER()).to.equal(spHandler.address);
+    expect(await SP.handlerAddr()).to.equal(spHandler.address);
     expect(String(await SP.getDailyEmission())).to.equal(
       parseEther("0").toString()
     );
@@ -169,11 +169,11 @@ async function createPool(acc) {
     await spFactory.createPool(inputA, inputB, tokenA.address, tokenB.address, {
       from: acc,
     });
-    var poolAddress = await pool.at(_pool);
+    var poolAddress = await Pool.at(_pool);
     let values = [tokenA.address, tokenB.address];
     let [token0, token1] = values.sort((a, b) => (a > b ? 1 : -1));
-    expect(await poolAddress.ASSET()).to.equal(token0);
-    expect(await poolAddress.TOKEN()).to.equal(token1);
+    expect(await poolAddress.asset1Addr()).to.equal(token0);
+    expect(await poolAddress.asset2Addr()).to.equal(token1);
     const newLength = await spFactory.allPoolsLength();
     assert.equal(String(newLength), _.BN2Str(initialLength.plus(1)));
   });
