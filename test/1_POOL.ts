@@ -122,7 +122,6 @@ contract(
     deploySparta();
     upgradeSparta(Depp);
     createPool(John);
-    testWorkflowWithBrokenTest();
   }
 );
 
@@ -179,9 +178,3 @@ async function createPool(acc) {
     assert.equal(String(newLength), _.BN2Str(initialLength.plus(1)));
   });
 }
-
-async function testWorkflowWithBrokenTest() {
-    it("This should break the workflow, remove and re-commit after checking", async () => {
-      assert.equal("1", "not1");
-    });
-  }
