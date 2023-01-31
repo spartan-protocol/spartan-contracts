@@ -9,9 +9,9 @@ contract Handler {
     address public immutable baseAddr; // SPARTA base contract address
     address public handlerAddr;
 
-    iTools private _tools; // TODO: These should probably be addresses rather than interfaced objects?
-    iReserve public reserve; // TODO: These should probably be addresses rather than interfaced objects?
-    iPoolFactory private _poolFactory; // TODO: These should probably be addresses rather than interfaced objects?
+    address public toolsAddr; 
+    address public reserveAddr; 
+    address public poolFactoryAddr; 
 
     constructor(address newBaseAddr) {
         baseAddr = newBaseAddr;
@@ -26,13 +26,13 @@ contract Handler {
     }
 
     function setGenesisAddresses(
-        address toolsAddr,
-        address reserveAddr,
-        address poolFactoryAddr
+        address newToolsAddr,
+        address newReserveAddr,
+        address newPoolFactoryAddr
     ) external isDeployer {
-        _tools = iTools(toolsAddr);
-        reserve = iReserve(reserveAddr);
-        _poolFactory = iPoolFactory(poolFactoryAddr);
+        toolsAddr = newToolsAddr;
+        reserveAddr = newReserveAddr;
+        poolFactoryAddr = newPoolFactoryAddr;
     }
 
     // Can purge deployer once DAO is stable and final

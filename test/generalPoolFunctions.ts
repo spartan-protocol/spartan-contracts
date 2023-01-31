@@ -157,24 +157,55 @@ async function upgradeSparta(acc) {
 
 async function createPool(acc) {
   it("should create a pool", async function () {
-    let inputA = parseEther("100");
-    let inputB = parseEther("110");
-    var initialLength = _.getBN(await spFactory.allPoolsLength());
+    let inputA = String(parseEther("100"));
+    let inputB = String(parseEther("110"));
+    var initialLength = _.getBN(await spFactory.poolCount());
     var _pool = await spFactory.createPool.call(
       inputA,
       inputB,
       tokenA.address,
       tokenB.address
     );
+    let initUsrBalTokenA = _.getBN(await tokenA.balanceOf(acc));
+    let initUsrBalTokenB = _.getBN(await tokenB.balanceOf(acc));
+    let initPoolBalTokenA = _.getBN(await tokenA.balanceOf(acc));
+    let initPoolBalTokenB = _.getBN(await tokenB.balanceOf(acc));
     await spFactory.createPool(inputA, inputB, tokenA.address, tokenB.address, {
       from: acc,
     });
     var poolAddress = await Pool.at(_pool);
+    const  {0:initPoolAssetDepthA, 1:initPoolAssetDepthB,2: _blockTimestampInit}  = await poolAddress.getReserves();
     let values = [tokenA.address, tokenB.address];
     let [token0, token1] = values.sort((a, b) => (a > b ? 1 : -1));
     expect(await poolAddress.asset1Addr()).to.equal(token0);
     expect(await poolAddress.asset2Addr()).to.equal(token1);
-    const newLength = await spFactory.allPoolsLength();
+    const newLength = await spFactory.poolCount();
+    let endUsrBalTokenA = _.getBN(await tokenA.balanceOf(acc));
+    let endUsrBalTokenB = _.getBN(await tokenB.balanceOf(acc));
+    let endPoolBalTokenA = _.getBN(await tokenA.balanceOf(acc));
+    let endPoolBalTokenB = _.getBN(await tokenB.balanceOf(acc));
+
+    const  {0:endPoolAssetDepthA,1:endPoolAssetDepthB,2: _blockTimestampLast} = await poolAddress.getReserves();
+
     assert.equal(String(newLength), _.BN2Str(initialLength.plus(1)));
+    assert.equal(_.BN2Str(endUsrBalTokenA), _.BN2Str(initUsrBalTokenA.minus(inputA)));
+    assert.equal(_.BN2Str(endUsrBalTokenB), _.BN2Str(initUsrBalTokenB.minus(inputB)));
+    assert.equal(_.BN2Str(initPoolBalTokenA), _.BN2Str(endPoolBalTokenA.plus(inputA)));
+    assert.equal(_.BN2Str(initPoolBalTokenB), _.BN2Str(endPoolBalTokenB.plus(inputB)));
+    assert.equal(_.BN2Str(endPoolAssetDepthA), _.BN2Str(_.getBN(initPoolAssetDepthA).plus(inputA)));
+    assert.equal(_.BN2Str(endPoolAssetDepthB), _.BN2Str(_.getBN(initPoolAssetDepthB).plus(inputB)));
+    await expect( await spFactory.createPool(inputB, inputB, tokenB.address, tokenB.address, {
+      from: acc,
+    })).to.be.rejectedWith("SpartanProtocolPool: IDENTICAL_ADDRESSES");
+    await expect( await spFactory.createPool(inputB, inputB, WBNB.address, "0x0000000000000000000000000000000000000000", {
+      from: acc,
+    })).to.be.rejectedWith("SpartanProtocol : NICE TRY");
+    
+    //test for correct LP token mint
+    //test correct balances on each token from USER
+    //test for BNB/WBNB 
+    //test for revert on WBNB:
+        
+    
   });
 }

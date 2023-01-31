@@ -3,20 +3,18 @@ pragma solidity ^0.8.9;
 import "./interfaces/iPool.sol";
 import "./Pool.sol";
 import "./bsc-library/interfaces/iBEP20.sol";
+import "hardhat/console.sol";
 
 contract PoolFactory {
     address private immutable _wbnbAddr; // Address of WBNB
 
     mapping(address => mapping(address => address)) public getPool;
     mapping(address => bool) public isPool;
-    address[] public allPools; // TODO: Handle this unbounded var
-    // TODO: Consider using a poolCount var and increment it instead of calling allPools.length
-
+    uint public poolCount;
     event PoolCreated(
         address indexed token1Addr,
         address indexed token2Addr,
-        address poolAddr,
-        uint poolCount // TODO: Handle this unbounded var
+        address poolAddr
     );
 
     constructor(address newWbnbAddr) {
@@ -34,17 +32,15 @@ contract PoolFactory {
             "SpartanProtocolPool: IDENTICAL_ADDRESSES"
         ); // Prevent same pairing
 
-        // TODO: prevent WBNB:BNB pool (currently the user can input wbnbAddr + bnbAddr and we end up with a BNB:WBNB pool)
-
         (address token1Addr, address token2Addr) = newToken1Addr < newToken2Addr
             ? (newToken1Addr, newToken2Addr)
             : (newToken2Addr, newToken1Addr); // Order by the token addr hexadecimal value
 
-        // MAKE SURE newToken1Addr, newToken2Addr are not used below this line except for _handleTransferIn()
-
         if (token1Addr == address(0)) {
             token1Addr = _wbnbAddr; // Handle BNB
+            require(token2Addr != _wbnbAddr,'SpartanProtocol : NICE TRY');
         }
+
         require(
             getPool[token1Addr][token2Addr] == address(0),
             "SpartanProtocalPool: POOL_EXISTS"
@@ -59,13 +55,12 @@ contract PoolFactory {
         getPool[token2Addr][token1Addr] = poolAddr; // populate mapping in the reverse direction
         _handleTransferIn(newToken1Addr, newToken1Input, poolAddr); // Transfer token1 liquidity to the new pool (respect user's choice of WBNB or BNB by using the input addresses/amounts)
         _handleTransferIn(newToken2Addr, newToken2Input, poolAddr); // Transfer token2 liquidity to the new pool (respect user's choice of WBNB or BNB by using the input addresses/amounts)
-        allPools.push(poolAddr);
         isPool[poolAddr] = true;
+        poolCount ++;
         emit PoolCreated(
             token1Addr,
             token2Addr,
-            poolAddr,
-            allPools.length // TODO: Handle this unbounded var, consider using a new var that increments instead
+            poolAddr
         );
     }
 
@@ -87,7 +82,4 @@ contract PoolFactory {
         }
     }
 
-    function allPoolsLength() external view returns (uint) {
-        return allPools.length; // TODO: Handle this unbounded var
-    }
 }
