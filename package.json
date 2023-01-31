@@ -1,25 +1,18 @@
 {
   "name": "spartan-protocol",
-  "description": "This project uses slip-based fee an AMM model",
+  "description": "A permissionless AMM using a liquidity-sensitive slip-base fee model",
   "version": "3.0.0",
-  "main": "hardhat.config.js",
-  "directories": {
-    "test": "test"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/spartan-protocol/spartan-contracts.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "homepage": "https://spartanprotocol.org/",
+  "repository": "github:spartan-protocol/spartan-contracts",
+  "author": "Spartan Protocol Community",
   "bugs": {
     "url": "https://github.com/spartan-protocol/spartan-contracts/issues"
   },
-  "homepage": "https://github.com/spartan-protocol/spartan-contracts#readme",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "node": "npx hardhat node"
+  },
   "dependencies": {
     "@openzeppelin/contracts": "^4.8.1",
     "bignumber": "^1.1.0",
