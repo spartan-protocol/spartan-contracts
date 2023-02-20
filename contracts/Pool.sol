@@ -13,8 +13,8 @@ contract Pool is iBEP20 {
 
     string private _name;
     string private _symbol;
-    uint128 private _asset1Depth;
-    uint128 private _asset2Depth;
+    uint256 private _asset1Depth;
+    uint256 private _asset2Depth;
 
     uint8 public override decimals;
     uint256 public genesis;
@@ -317,6 +317,19 @@ contract Pool is iBEP20 {
         //  uint256 _actualAsset2Input = _checkAsset2Received(); // Get the received asset2 amount
     }
 
+    // Contract adds liquidity for user 
+    function addForMember(address member) external {
+        uint256 _inputAsset1 = _checkAsset1Received(); 
+        uint256 _inputAsset2 = _checkAsset2Received(); 
+         _asset1Depth = _inputAsset1;
+        _asset2Depth = _inputAsset2;
+
+        
+    }
+
+    
+
+
     function remove() external returns (bool) {}
 
     function swap() external returns (uint) {}
@@ -350,13 +363,11 @@ contract Pool is iBEP20 {
         view
         returns (
             uint256 asset1Depth,
-            uint256 asset2Depth,
-            uint256 _blockTimestampLast
+            uint256 asset2Depth
         )
     {
         asset1Depth = _asset1Depth;
         asset2Depth = _asset2Depth;
-        _blockTimestampLast = block.timestamp;
     }
 
     function _safeTransfer(address token, address to, uint value) private {

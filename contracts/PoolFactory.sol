@@ -62,7 +62,8 @@ contract PoolFactory {
             token2Addr,
             poolAddr
         );
-    }
+         iPool(poolAddr).addForMember(msg.sender); // Perform the liquidity-add for the user
+    } 
 
     function _handleTransferIn(
         address tokenAddr,
