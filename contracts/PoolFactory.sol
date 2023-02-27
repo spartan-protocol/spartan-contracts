@@ -35,7 +35,7 @@ contract PoolFactory {
         (address token1Addr, address token2Addr) = newToken1Addr < newToken2Addr
             ? (newToken1Addr, newToken2Addr)
             : (newToken2Addr, newToken1Addr); // Order by the token addr hexadecimal value
-
+    
         if (token1Addr == address(0)) {
             token1Addr = _wbnbAddr; // Handle BNB
             require(token2Addr != _wbnbAddr,'SpartanProtocol : NICE TRY');

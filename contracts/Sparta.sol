@@ -19,11 +19,7 @@ contract Sparta is iBEP20 {
     mapping(address => uint256) private _balances;
     mapping(address => mapping(address => uint256)) private _allowances;
 
-    // Parameters
-    bool public minting;
-    bool public emitting;
-    uint256 public emissionCurve;
-    uint256 private _100m;
+   
     uint256 public maxSupply;
 
     uint256 public secondsPerEra;
@@ -44,12 +40,9 @@ contract Sparta is iBEP20 {
     //=====================================CREATION=========================================//
     // Constructor
     constructor(address newBaseV2Addr) {
-        _100m = 100 * 10 ** 6 * 10 ** decimals; // 100m
         maxSupply = 300 * 10 ** 6 * 10 ** decimals; // 300m
-        emissionCurve = 2048;
         baseV2Addr = newBaseV2Addr;
-        secondsPerEra = 86400; // 1 day
-        nextEraTime = block.timestamp + secondsPerEra;
+
         deployerAddr = msg.sender;
         //  _balances[msg.sender] = 1 * 10**7 * 10**decimals;     // TestHelper Only!!!
         //  totalSupply = 1 * 10**6 * 10**decimals;               // TestHelper Only!!!
@@ -155,7 +148,6 @@ contract Sparta is iBEP20 {
         _balances[sender] -= amount;
         _balances[recipient] += amount;
         emit Transfer(sender, recipient, amount);
-        _checkEmission();
     }
 
     // Internal mint (upgrading and daily emissions)
@@ -187,22 +179,6 @@ contract Sparta is iBEP20 {
     }
 
     //=========================================CORE FUNCTIONS=========================================//
-    // Can start
-    function flipEmissions() external isDeployer {
-        emitting = !emitting;
-    }
-
-    // Can stop
-    function flipMinting() external isDeployer {
-        minting = !minting;
-    }
-
-    // Can set params
-    function setParams(uint256 newTime, uint256 newCurve) external isDeployer {
-        secondsPerEra = newTime;
-        emissionCurve = newCurve;
-    }
-
     // Can change handler address
     function changeHandler(address newHandlerAddr) external isDeployer {
         require(newHandlerAddr != address(0), "address err");
@@ -219,30 +195,7 @@ contract Sparta is iBEP20 {
         handlerAddr = address(0);
     }
 
-    //======================================EMISSION========================================//
-    // Internal - Update emission function
-    function _checkEmission() private {
-        if ((block.timestamp >= nextEraTime) && emitting) {
-            // If new Era and allowed to emit
-            nextEraTime = block.timestamp + secondsPerEra; // Set next Era time
-            uint256 _emission = getDailyEmission(); // Get Daily Dmission
-            _mint(getReserve(), _emission); // Mint to the RESERVE Address
-            emit NewEra(nextEraTime, _emission); // Emit Event
-        }
-    }
-
-    // Calculate Daily Emission
-    function getDailyEmission() public view returns (uint256) {
-        uint _adjustedCap;
-        if (totalSupply <= _100m) {
-            // If less than 100m, then adjust cap down
-            _adjustedCap = (maxSupply * totalSupply) / (_100m); // 300m * 50m / 100m = 300m * 50% = 150m
-        } else {
-            _adjustedCap = maxSupply; // 300m
-        }
-        return (_adjustedCap - totalSupply) / (emissionCurve); // outstanding / 2048
-    }
-
+    
     //==========================================Minting============================================//
     function migrate() external {
         uint amount = iBEP20(baseV2Addr).balanceOf(msg.sender); // Get balance of sender
@@ -259,6 +212,6 @@ contract Sparta is iBEP20 {
 
     //=========================================Helpers================================================//
     function getReserve() internal view returns (address) {
-        return iHandler(handlerAddr).reserve();
+        return iHandler(handlerAddr).reserveAddr();
     }
 }

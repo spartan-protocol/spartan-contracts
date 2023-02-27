@@ -2,9 +2,12 @@
 pragma solidity ^0.8.9;
 import "./bsc-library/interfaces/iBEP20.sol";
 import "./interfaces/iHandler.sol";
+import "./interfaces/iTools.sol";
+import "./interfaces/iSPARTA.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol"; 
 
-contract Pool is iBEP20 {
+contract Pool is iBEP20, ReentrancyGuard {
     using SafeMath for uint256;
 
     uint public constant minLiquidity = 10 ** 3;
@@ -22,10 +25,12 @@ contract Pool is iBEP20 {
     address public asset1Addr; // Settlement Asset
     address public asset2Addr; // Paired Token
     address public immutable factoryAddr;
+    address public immutable SPARTA;  // Address of SPARTA token contract
     mapping(address => uint) private _balances;
     mapping(address => mapping(address => uint)) private _allowances;
 
-    constructor() {
+    constructor(address sparta) {
+
         factoryAddr = msg.sender;
     }
 
@@ -45,6 +50,10 @@ contract Pool is iBEP20 {
         _symbol = string(abi.encodePacked(poolFront, "-SPP"));
         decimals = 18;
         genesis = block.timestamp;
+    }
+
+     function _Handler() internal view returns(address) {
+        return iSPARTA(SPARTA).handlerAddr(); // Get the Handler address reported by Sparta contract
     }
 
     //========================================IBEP20=========================================//
@@ -318,10 +327,11 @@ contract Pool is iBEP20 {
     }
 
     // Contract adds liquidity for user 
-    function addForMember(address member) external {
+    function addForMember(address member) external nonReentrant {
         uint256 _inputAsset1 = _checkAsset1Received(); 
         uint256 _inputAsset2 = _checkAsset2Received(); 
-         _asset1Depth = _inputAsset1;
+        uint256 liquidityUnits = iTools(_Handler().toolsAddr()).calcLiquidityUnits(_inputAsset1, _asset1Depth, _inputAsset2, _asset2Depth, totalSupply); // Calculate LP tokens to mint
+         _asset1Depth = _inputAsset1; 
         _asset2Depth = _inputAsset2;
 
         

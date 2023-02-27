@@ -6,5 +6,8 @@ interface iHandler {
 
     function handlerAddr() external view returns (address);
 
-    function reserve() external view returns (address);
+    function reserveAddr() external view returns (address);
+
+    function toolsAddr() external view returns (address);
+    
 }
