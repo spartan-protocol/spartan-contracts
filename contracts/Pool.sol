@@ -4,6 +4,7 @@ import "./bsc-library/interfaces/iBEP20.sol";
 import "./interfaces/iHandler.sol";
 import "./interfaces/iTools.sol";
 import "./interfaces/iSPARTA.sol";
+import "./utils/Math.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol"; 
 
@@ -29,9 +30,17 @@ contract Pool is iBEP20, ReentrancyGuard {
     mapping(address => uint) private _balances;
     mapping(address => mapping(address => uint)) private _allowances;
 
-    constructor(address sparta) {
+    event Mint(address indexed sender, uint amount0, uint amount1);
 
+    // Restrict access
+    modifier onlyPROTOCOL() {
+        require(msg.sender == _Handler().routerAddr() || msg.sender == _Handler().poolFactoryAddr());  
+        _;
+    }
+
+    constructor(address sparta) {
         factoryAddr = msg.sender;
+        SPARTA = sparta;
     }
 
     // called once by the factory at time of deployment
@@ -52,7 +61,7 @@ contract Pool is iBEP20, ReentrancyGuard {
         genesis = block.timestamp;
     }
 
-     function _Handler() internal view returns(address) {
+     function _Handler() internal view returns(iHandler) {
         return iSPARTA(SPARTA).handlerAddr(); // Get the Handler address reported by Sparta contract
     }
 
@@ -327,14 +336,24 @@ contract Pool is iBEP20, ReentrancyGuard {
     }
 
     // Contract adds liquidity for user 
-    function addForMember(address member) external nonReentrant {
-        uint256 _inputAsset1 = _checkAsset1Received(); 
-        uint256 _inputAsset2 = _checkAsset2Received(); 
-        uint256 liquidityUnits = iTools(_Handler().toolsAddr()).calcLiquidityUnits(_inputAsset1, _asset1Depth, _inputAsset2, _asset2Depth, totalSupply); // Calculate LP tokens to mint
-         _asset1Depth = _inputAsset1; 
-        _asset2Depth = _inputAsset2;
+    function addForMember(address to) external nonReentrant returns (uint liquidity){
+        (uint _asset1Balance, uint _asset2Balance) = getReserves(); // gas savings
+        uint current1Balance = iBEP20(asset1Addr).balanceOf(address(this));
+        uint current2Balance = iBEP20(asset2Addr).balanceOf(address(this));
+        uint256 inputAsset1 = current1Balance.sub(_asset1Balance);
+        uint256 inputAsset2 = current2Balance.sub(_asset2Balance);
+         if (totalSupply == 0) {
+            liquidity = Math.sqrt(inputAsset1.mul(inputAsset2)).sub(minLiquidity);
+           _mint(SPARTA, minLiquidity); // permanently lock the first minLiquidity tokens
+        } else {
+            liquidity = iTools(_Handler().toolsAddr()).calcLiquidityUnits(inputAsset1, _asset1Depth, inputAsset2, _asset2Depth, totalSupply); // Calculate liquidity tokens to mint
 
-        
+        }
+        require(liquidity > 0, 'SpartanProtocolPool: INSUFFICIENT_LIQUIDITY');
+        _mint(to, liquidity);
+        _asset1Depth = current1Balance;// update reserves
+        _asset2Depth = current2Balance; // update reserves
+        emit Mint(msg.sender, inputAsset1, inputAsset2);
     }
 
     
@@ -345,29 +364,6 @@ contract Pool is iBEP20, ReentrancyGuard {
     function swap() external returns (uint) {}
 
     //=======================================INTERNAL LOGIC======================================//
-
-    // Check the asset1 amount received by this Pool
-    function _checkAsset1Received() internal view returns (uint256 _received) {
-        uint currentBalance = iBEP20(asset1Addr).balanceOf(address(this));
-        if (currentBalance > _asset1Depth) {
-            _received = currentBalance - _asset1Depth;
-        } else {
-            _received = 0;
-        }
-        return _received;
-    }
-
-    // Check the asset2 amount received by this Pool
-    function _checkAsset2Received() internal view returns (uint256 _received) {
-        uint currentBalance = iBEP20(asset2Addr).balanceOf(address(this));
-        if (currentBalance > _asset2Depth) {
-            _received = currentBalance - _asset2Depth;
-        } else {
-            _received = 0;
-        }
-        return _received;
-    }
-
     function getReserves()
         public
         view
@@ -378,6 +374,12 @@ contract Pool is iBEP20, ReentrancyGuard {
     {
         asset1Depth = _asset1Depth;
         asset2Depth = _asset2Depth;
+    }
+    
+    // Sync internal balances to actual
+    function sync() external onlyPROTOCOL  {
+        _asset1Depth = iBEP20(asset1Addr).balanceOf(address(this));
+        _asset2Depth = iBEP20(asset2Addr).balanceOf(address(this));
     }
 
     function _safeTransfer(address token, address to, uint value) private {

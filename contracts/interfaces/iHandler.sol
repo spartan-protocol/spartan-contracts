@@ -9,5 +9,9 @@ interface iHandler {
     function reserveAddr() external view returns (address);
 
     function toolsAddr() external view returns (address);
+
+    function routerAddr() external returns (address);
+
+    function poolFactoryAddr() external returns (address);
     
 }
