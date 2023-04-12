@@ -29,8 +29,6 @@ contract Sparta is iBEP20 {
     address public baseV2Addr;
     address public handlerAddr;
 
-    event NewEra(uint256 nextEraTime, uint256 emission);
-
     // Only DAO can execute
     modifier isDeployer() {
         require(msg.sender == deployerAddr, "!DEPLOYER");

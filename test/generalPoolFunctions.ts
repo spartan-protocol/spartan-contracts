@@ -12,6 +12,7 @@ var BigNumber = require("bignumber.js");
 const _ = require("./utils.js");
 const truffleAssert = require('truffle-assertions');
 
+
 const Sparta = artifacts.require("./Sparta.sol");
 const Handler = artifacts.require("./Handler.sol");
 const Tools = artifacts.require("./Tools.sol");
@@ -58,7 +59,7 @@ contract(
       // Deploy HANDLER
       spHandler = await Handler.new(SP.address);
       // Deploy TOOLS
-      spTools = await Tools.new();
+      spTools = await Tools.new(SP.address);
       // Deploy RESERVE
       spReserve = await Reserve.new(SP.address);
       // Deploy mock BEP20s
@@ -135,12 +136,7 @@ async function deploySparta() {
     expect(String(await SP.maxSupply())).to.equal(
       parseEther("300000000").toString()
     );
-    expect(String(await SP.emissionCurve())).to.equal("2048");
-    expect(await SP.emitting()).to.equal(false);
     expect(await SP.handlerAddr()).to.equal(spHandler.address);
-    expect(String(await SP.getDailyEmission())).to.equal(
-      parseEther("0").toString()
-    );
   });
 }
 
@@ -209,10 +205,9 @@ async function createPool(acc) {
     await truffleAssert.reverts(spFactory.createPool(inputB, inputB,  tokenB.address, tokenA.address, {
       from: acc,
     }), "SpartanProtocalPool: POOL_EXISTS");
-
-    //test for correct LP token mint   
-
-    
     
   });
+
+
+
 }
