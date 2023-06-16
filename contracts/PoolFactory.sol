@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 // Interfaces
-import "./bsc-library/interfaces/iBEP20.sol"; // TODO: Replace with OpenZ ERC20 interface
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/iPool.sol";
 // Libraries | Contracts
 import "hardhat/console.sol";
@@ -9,7 +9,7 @@ import "./Pool.sol";
 
 contract PoolFactory {
     address public immutable wrapAddr; // Address of wrapped version of the chain's native coin
-    address public immutable burnAddr; // Address for burned LPs to be sent to
+    address public immutable protocolTokenAddr; // Address of the protocol's token. For deriving contract addresses and also to send the burned LPs to
     uint256 public poolCount;
 
     mapping(address => mapping(address => address)) public getPool;
@@ -21,9 +21,9 @@ contract PoolFactory {
         address poolAddr
     );
 
-    constructor(address newWrappedAddr, address newBurnAddr) {
-        wrapAddr = newWrappedAddr;
-        burnAddr = newBurnAddr;
+    constructor(address newWrapAddr, address newProtocolTokenAddr) {
+        wrapAddr = newWrapAddr;
+        protocolTokenAddr = newProtocolTokenAddr;
     }
 
     function createPool(
@@ -49,8 +49,17 @@ contract PoolFactory {
         );
 
         /////////////// NORMAL DEPLOY METHOD
+        string memory poolFront = string(
+            abi.encodePacked(
+                ERC20(newToken1Addr).symbol(),
+                ":",
+                ERC20(newToken2Addr).symbol()
+            )
+        );
+        string memory _name = string(abi.encodePacked(poolFront, "-SP-Pool"));
+        string memory _symbol = string(abi.encodePacked(poolFront, "-SPP"));
         address newPoolAddr = address(
-            new Pool(burnAddr, token1Addr, token2Addr)
+            new Pool(_name, _symbol, protocolTokenAddr, token1Addr, token2Addr)
         );
 
         /////////////// ALTERNATIVE DEPLOY METHOD - Create2()
@@ -81,10 +90,10 @@ contract PoolFactory {
             require(tokenUnits == msg.value);
             (bool success, ) = payable(wrapAddr).call{value: tokenUnits}(""); // Wrap BNB
             require(success);
-            iBEP20(wrapAddr).transfer(poolAddr, tokenUnits); // Tsf WBNB (PoolFactory -> Pool)
+            IERC20(wrapAddr).transfer(poolAddr, tokenUnits); // Tsf WBNB (PoolFactory -> Pool)
         } else {
             require(
-                iBEP20(tokenAddr).transferFrom(msg.sender, poolAddr, tokenUnits)
+                IERC20(tokenAddr).transferFrom(msg.sender, poolAddr, tokenUnits)
             ); // Tsf TOKEN (User -> Pool)
         }
     }
