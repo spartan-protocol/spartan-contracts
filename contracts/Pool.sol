@@ -1,12 +1,15 @@
 //SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
-import "./bsc-library/interfaces/iBEP20.sol";
+// Interfaces
+import "./bsc-library/interfaces/iBEP20.sol"; // TODO: Replace with OpenZ ERC20 interface
 import "./interfaces/iHandler.sol";
 import "./interfaces/iTools.sol";
 import "./interfaces/iSPARTA.sol";
-import "./utils/Math.sol";
+// Libraries | Contracts
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+// TODO: Add in OpenZ SafeERC20 library and use for safeTransfer() etc below
+import "./utils/Math.sol";
 
 contract Pool is iBEP20, ReentrancyGuard {
     using SafeMath for uint256;
@@ -21,7 +24,6 @@ contract Pool is iBEP20, ReentrancyGuard {
     uint256 private _asset2Depth;
 
     uint8 public override decimals;
-    uint32 public oneWeek;
     uint256 public genesis;
     uint256 public _totalSupply;
     address public asset1Addr; // Settlement Asset
@@ -31,11 +33,7 @@ contract Pool is iBEP20, ReentrancyGuard {
     mapping(address => uint) private _balances;
     mapping(address => mapping(address => uint)) private _allowances;
 
-    event Mint(
-        address indexed sender, 
-        uint amount0, 
-        uint amount1
-        );
+    event Mint(address indexed sender, uint amount0, uint amount1);
     event Burn(
         address indexed sender,
         uint amount0,
@@ -44,13 +42,12 @@ contract Pool is iBEP20, ReentrancyGuard {
     );
     // Event to signal that a token swap has occurred
     event Swap(
-        address indexed inputToken, 
+        address indexed inputToken,
         address indexed outputToken,
-        uint256 inputAmount, 
-        uint256 outputAmount, 
+        uint256 inputAmount,
+        uint256 outputAmount,
         uint256 swapFee
     );
-
 
     // Restrict access
     modifier onlyPROTOCOL() {
@@ -61,15 +58,9 @@ contract Pool is iBEP20, ReentrancyGuard {
         _;
     }
 
-    constructor(address sparta) {
+    constructor(address sparta, address newToken1Addr, address newToken2Addr) {
         factoryAddr = msg.sender;
         SPARTA = sparta;
-        oneWeek = 604800; //oneWeek;
-    }
-
-    // called once by the factory at time of deployment
-    function initialize(address newToken1Addr, address newToken2Addr) external {
-        require(msg.sender == factoryAddr, "SPARTANPROTOCOL: FORBIDDEN"); // sufficient check
         asset1Addr = newToken1Addr;
         asset2Addr = newToken2Addr;
         string memory poolFront = string(
@@ -84,6 +75,24 @@ contract Pool is iBEP20, ReentrancyGuard {
         decimals = 18;
         genesis = block.timestamp;
     }
+
+    ////// ALTERNATIVE DEPLOY METHOD w/ create2() - called once by the factory at time of deployment
+    // function initialize(address newToken1Addr, address newToken2Addr) external {
+    //     require(msg.sender == factoryAddr, "SPARTANPROTOCOL: FORBIDDEN"); // sufficient check
+    //     asset1Addr = newToken1Addr;
+    //     asset2Addr = newToken2Addr;
+    //     string memory poolFront = string(
+    //         abi.encodePacked(
+    //             iBEP20(newToken1Addr).symbol(),
+    //             ":",
+    //             iBEP20(newToken2Addr).symbol()
+    //         )
+    //     );
+    //     _name = string(abi.encodePacked(poolFront, "-SpartanProtocolPool"));
+    //     _symbol = string(abi.encodePacked(poolFront, "-SPP"));
+    //     decimals = 18;
+    //     genesis = block.timestamp;
+    // }
 
     function _Handler() internal view returns (iHandler) {
         return iSPARTA(SPARTA).handlerAddr(); // Get the Handler address reported by Sparta contract
@@ -372,10 +381,7 @@ contract Pool is iBEP20, ReentrancyGuard {
         uint256 inputAsset1 = current1Balance - _asset1Depth;
         uint256 inputAsset2 = current2Balance - _asset2Depth;
 
-        require(
-            inputAsset1 > 0 && inputAsset2 > 0,
-            "SpartanProtocolPool: INSUFFICIENT_INPUT_AMOUNT"
-        );
+        require(inputAsset1 > 0 && inputAsset2 > 0, "POOL: INPUT_TOO_LOW");
 
         if (_totalSupply == 0) {
             liquidity = Math.sqrt(inputAsset1 * inputAsset2) - minLiquidity;
@@ -390,7 +396,7 @@ contract Pool is iBEP20, ReentrancyGuard {
             ); // Calculate liquidity tokens to mint
         }
 
-        require(liquidity > 0, "SpartanProtocolPool: INSUFFICIENT_LIQUIDITY");
+        require(liquidity > 0, "POOL: MINTED_TOO_LOW");
 
         _mint(to, liquidity);
 
@@ -404,9 +410,9 @@ contract Pool is iBEP20, ReentrancyGuard {
     function removeLiquidity(
         uint liquidity
     ) external nonReentrant returns (uint asset1Amount, uint asset2Amount) {
-        require(liquidity > 0, "SpartanProtocolPool: INSUFFICIENT_LIQUIDITY");
+        require(liquidity > 0, "POOL: INPUT_TOO_LOW");
         uint totalLiquidity = totalSupply();
-        require(totalLiquidity > 0, "SpartanProtocolPool: NO_LIQUIDITY");
+        require(totalLiquidity > 0, "POOL: SUPPLY_TOO_LOW");
         (uint current1Balance, uint current2Balance) = (
             iBEP20(asset1Addr).balanceOf(address(this)),
             iBEP20(asset2Addr).balanceOf(address(this))
@@ -414,10 +420,7 @@ contract Pool is iBEP20, ReentrancyGuard {
         uint256 liquidityPercentage = liquidity.mul(1e18).div(totalLiquidity);
         asset1Amount = current1Balance.mul(liquidityPercentage).div(1e18);
         asset2Amount = current2Balance.mul(liquidityPercentage).div(1e18);
-        require(
-            asset1Amount > 0 && asset2Amount > 0,
-            "SpartanProtocolPool: INSUFFICIENT_OUTPUT_AMOUNT"
-        );
+        require(asset1Amount > 0 && asset2Amount > 0, "POOL: OUTPUT_TOO_LOW");
         _burn(msg.sender, liquidity);
         unchecked {
             _safeTransfer(asset1Addr, msg.sender, asset1Amount);
@@ -426,27 +429,52 @@ contract Pool is iBEP20, ReentrancyGuard {
         emit Burn(msg.sender, asset1Amount, asset2Amount, liquidity);
     }
 
-    function swapToken(address inputToken, address outputToken, uint256 inputAmount) external nonReentrant returns (uint256 outputAmount) {
-    require(inputToken != outputToken, "SpartanProtocolPool: SAME_TOKEN_SWAP");
+    function swapToken(
+        address inputToken,
+        address outputToken,
+        uint256 inputAmount
+    ) external nonReentrant returns (uint256 outputAmount) {
+        require(inputToken != outputToken, "POOL: TOKEN_ADDR_SAME");
 
-    (uint256 inputTokenDepth, uint256 outputTokenDepth) = getReserves();
-    require(inputTokenDepth > 0 && outputTokenDepth > 0, "SpartanProtocolPool: POOL_NOT_CREATED");
+        (uint256 inputTokenDepth, uint256 outputTokenDepth) = getReserves();
+        require(
+            inputTokenDepth > 0 && outputTokenDepth > 0,
+            "POOL: RESERVES_TOO_LOW"
+        );
 
-    uint256 outputTokenBalance = iBEP20(outputToken).balanceOf(address(this));
-    uint256 inputTokenBalance = iBEP20(inputToken).balanceOf(address(this));
+        uint256 outputTokenBalance = iBEP20(outputToken).balanceOf(
+            address(this)
+        );
+        uint256 inputTokenBalance = iBEP20(inputToken).balanceOf(address(this));
 
-    uint256 numerator = inputAmount.mul(inputTokenDepth).mul(outputTokenBalance);
-    uint256 denominator = (inputAmount.add(inputTokenBalance)).mul(inputAmount.add(inputTokenDepth));
-    outputAmount = numerator.div(denominator);
-    uint256 swapFee = outputAmount.mul(outputAmount).mul(outputTokenDepth).div((inputAmount.add(inputTokenDepth)).mul(inputAmount.add(inputTokenDepth)));
-    require(outputAmount > 0, "SpartanProtocolPool: INSUFFICIENT_OUTPUT_AMOUNT");
-    unchecked {
-        iBEP20(inputToken).safeTransferFrom(msg.sender, address(this), inputAmount);
-        iBEP20(outputToken).safeTransfer(msg.sender, outputAmount);
+        uint256 numerator = inputAmount.mul(inputTokenDepth).mul(
+            outputTokenBalance
+        );
+        uint256 denominator = (inputAmount.add(inputTokenBalance)).mul(
+            inputAmount.add(inputTokenDepth)
+        );
+        outputAmount = numerator.div(denominator);
+        uint256 swapFee = outputAmount
+            .mul(outputAmount)
+            .mul(outputTokenDepth)
+            .div(
+                (inputAmount.add(inputTokenDepth)).mul(
+                    inputAmount.add(inputTokenDepth)
+                )
+            );
+        require(outputAmount > 0, "POOL: OUTPUT_TOO_LOW");
+        unchecked {
+            iBEP20(inputToken).safeTransferFrom(
+                msg.sender,
+                address(this),
+                inputAmount
+            ); // TODO: Add in OpenZ SafeERC20 library and use here
+            iBEP20(outputToken).safeTransfer(msg.sender, outputAmount); // TODO: Add in OpenZ SafeERC20 library and use here
+        }
+
+        emit Swap(inputToken, outputToken, inputAmount, outputAmount, swapFee);
     }
 
-    emit Swap(inputToken, outputToken, inputAmount, outputAmount, swapFee);
-}
     //=======================================INTERNAL LOGIC======================================//
     function getReserves()
         public
@@ -469,7 +497,7 @@ contract Pool is iBEP20, ReentrancyGuard {
         );
         require(
             success && (data.length == 0 || abi.decode(data, (bool))),
-            "Pancake: TRANSFER_FAILED"
+            "POOL: TRANSFER_FAILED"
         );
     }
 }
