@@ -2,12 +2,9 @@
 pragma solidity ^0.8.9;
 
 // a library for performing various math operations
+// TODO: Rename this library as it conflicts with common libraries
 
 library Math {
-    function min(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        z = x < y ? x : y;
-    }
-
     // babylonian method (https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Babylonian_method)
     function sqrt(uint256 y) internal pure returns (uint256 z) {
         if (y > 3) {

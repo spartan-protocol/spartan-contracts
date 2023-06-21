@@ -4,7 +4,6 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/iPool.sol";
 // Libraries | Contracts
-import "hardhat/console.sol";
 import "./Pool.sol";
 
 contract PoolFactory {
@@ -31,8 +30,8 @@ contract PoolFactory {
         uint256 newToken2Input,
         address newToken1Addr,
         address newToken2Addr
-    ) external payable returns (address poolAddr) {
-        require(newToken1Addr != newToken2Addr, "FACTORY: IDENTICAL_ADDRESSES"); // Prevent same pairing
+    ) external payable returns (address newPoolAddr) {
+        require(newToken1Addr != newToken2Addr, "!Valid1"); // Prevent same pairing
 
         (address token1Addr, address token2Addr) = newToken1Addr < newToken2Addr
             ? (newToken1Addr, newToken2Addr)
@@ -40,13 +39,10 @@ contract PoolFactory {
 
         if (token1Addr == address(0)) {
             token1Addr = wrapAddr; // Handle BNB
-            require(token2Addr != wrapAddr, "FACTORY: TOKENS_SAME");
+            require(token2Addr != wrapAddr, "!Valid2");
         }
 
-        require(
-            getPool[token1Addr][token2Addr] == address(0),
-            "FACTORY: POOL_EXISTS"
-        );
+        require(getPool[token1Addr][token2Addr] == address(0), "Exists");
 
         /////////////// NORMAL DEPLOY METHOD
         string memory poolFront = string(
@@ -58,23 +54,24 @@ contract PoolFactory {
         );
         string memory _name = string(abi.encodePacked(poolFront, "-SP-Pool"));
         string memory _symbol = string(abi.encodePacked(poolFront, "-SPP"));
-        address newPoolAddr = address(
+        newPoolAddr = address(
             new Pool(_name, _symbol, protocolTokenAddr, token1Addr, token2Addr)
         );
 
         /////////////// ALTERNATIVE DEPLOY METHOD - Create2()
+        // address newPoolAddr;
         // bytes memory bytecode = type(Pool).creationCode;
         // bytes32 salt = keccak256(abi.encodePacked(token1Addr, token2Addr));
         // assembly {
-        //     poolAddr := create2(0, add(bytecode, 32), mload(bytecode), salt)
+        //     newPoolAddr := create2(0, add(bytecode, 32), mload(bytecode), salt)
         // }
-        // iPool(poolAddr).initialize(token1Addr, token2Addr);
+        // iPool(newPoolAddr).initialize(token1Addr, token2Addr);
 
         getPool[token1Addr][token2Addr] = newPoolAddr;
         getPool[token2Addr][token1Addr] = newPoolAddr; // populate mapping in the reverse direction
         _handleTransferIn(newToken1Addr, newToken1Input, newPoolAddr); // Transfer token1 liquidity to the new pool (respect user's choice of WBNB or BNB by using the input addresses/amounts)
         _handleTransferIn(newToken2Addr, newToken2Input, newPoolAddr); // Transfer token2 liquidity to the new pool (respect user's choice of WBNB or BNB by using the input addresses/amounts)
-        isPool[poolAddr] = true;
+        isPool[newPoolAddr] = true;
         poolCount++;
         emit PoolCreated(token1Addr, token2Addr, newPoolAddr);
         iPool(newPoolAddr).addForMember(msg.sender); // Perform the liquidity-add for the user

@@ -1,5 +1,6 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+import "hardhat-contract-sizer";
 
 const config: HardhatUserConfig = {
   solidity: "0.8.9",
@@ -8,6 +9,9 @@ const config: HardhatUserConfig = {
     currency: "USD",
     gasPrice: 10,
     token: "BNB",
+  },
+  contractSizer: {
+    // runOnCompile: true, // Uncomment this if you want to see table of contract sizes on compile/test/etc
   },
 
   //////////// LOCAL FRESH NETWORK
@@ -23,6 +27,7 @@ const config: HardhatUserConfig = {
   //////////// FORK BSC MAINNET THEN RUN FROM THERE LOCALLY
   networks: {
     hardhat: {
+      // allowUnlimitedContractSize: true,
       forking: {
         //// IDEALLY USE A PRIVATE ARCHIVE NODE RPC, BUT BELOW ARE
         //// PUBLIC RPCs YOU CAN CYCLE THRU, ONLY UNCOMMENT 1 AT A TIME

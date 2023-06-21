@@ -14,7 +14,8 @@
     "node": "npx hardhat node"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "4.9.1"
+    "@openzeppelin/contracts": "4.9.1",
+    "bignumber.js": "^9.1.1"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.1",
@@ -28,6 +29,7 @@
     "chai": "^4.3.7",
     "ethers": "^6.6.0",
     "hardhat": "^2.15.0",
+    "hardhat-contract-sizer": "^2.10.0",
     "hardhat-gas-reporter": "^1.0.9",
     "solidity-coverage": "^0.8.2",
     "ts-node": "^10.9.1",
