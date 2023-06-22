@@ -11,6 +11,9 @@ contract PoolFactory {
     address public immutable protocolTokenAddr; // Address of the protocol's token. For deriving contract addresses and also to send the burned LPs to
     uint256 public poolCount;
 
+    // TODO: Consider whether we need to translate address(0) into wrapAddr ...
+    // ... if we do, make the getPool mapping internal and create an ...
+    // ... external getter of the same name: 'getPool()'
     mapping(address => mapping(address => address)) public getPool;
     mapping(address => bool) public isPool;
 
@@ -47,9 +50,9 @@ contract PoolFactory {
         /////////////// NORMAL DEPLOY METHOD
         string memory poolFront = string(
             abi.encodePacked(
-                ERC20(newToken1Addr).symbol(),
+                ERC20(token1Addr).symbol(),
                 ":",
-                ERC20(newToken2Addr).symbol()
+                ERC20(token2Addr).symbol()
             )
         );
         string memory _name = string(abi.encodePacked(poolFront, "-SP-Pool"));
