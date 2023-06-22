@@ -34,15 +34,20 @@ contract PoolFactory {
         address newToken1Addr,
         address newToken2Addr
     ) external payable returns (address newPoolAddr) {
-        require(newToken1Addr != newToken2Addr, "!Valid1"); // Prevent same pairing
-
-        (address token1Addr, address token2Addr) = newToken1Addr < newToken2Addr
-            ? (newToken1Addr, newToken2Addr)
-            : (newToken2Addr, newToken1Addr); // Order by the token addr hexadecimal value
-
+        address token1Addr = newToken1Addr; // Cache selected token1 address
+        address token2Addr = newToken2Addr; // Cache selected token2 address
         if (token1Addr == address(0)) {
-            token1Addr = wrapAddr; // Handle BNB
-            require(token2Addr != wrapAddr, "!Valid2");
+            token1Addr = wrapAddr; // Translate token1 native->wrapped address
+        }
+        if (token2Addr == address(0)) {
+            token2Addr = wrapAddr; // Translate token2 native->wrapped address
+        }
+        require(token1Addr != token2Addr, "!Valid"); // Prevent same pairing
+
+        if (token1Addr > token2Addr) {
+            address _addr1 = token1Addr; // Cache address
+            token1Addr = token2Addr; // Swap token1<>token2 addresses ...
+            token2Addr = _addr1; // ... into hexadecimal value order
         }
 
         require(getPool[token1Addr][token2Addr] == address(0), "Exists");

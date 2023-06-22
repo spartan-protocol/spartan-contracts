@@ -203,12 +203,12 @@ describe("AMM Contracts Suite", function () {
           poolFactory
             .connect(addr1)
             .createPool(oneThousand, oneHundred, busdAddr, busdAddr)
-        ).to.be.revertedWith("!Valid1");
+        ).to.be.revertedWith("!Valid");
         await expect(
           poolFactory
             .connect(addr1)
             .createPool(oneThousand, oneHundred, zeroAddr, zeroAddr)
-        ).to.be.revertedWith("!Valid1");
+        ).to.be.revertedWith("!Valid");
       });
 
       it("Pool deploy should fail if native<>wrapped pool is attempted", async function () {
@@ -217,12 +217,12 @@ describe("AMM Contracts Suite", function () {
           poolFactory
             .connect(addr1)
             .createPool(oneThousand, oneHundred, wrapAddr, zeroAddr)
-        ).to.be.revertedWith("!Valid2");
+        ).to.be.revertedWith("!Valid");
         await expect(
           poolFactory
             .connect(addr1)
             .createPool(oneThousand, oneHundred, zeroAddr, wrapAddr)
-        ).to.be.revertedWith("!Valid2");
+        ).to.be.revertedWith("!Valid");
       });
 
       it("Pool deploy should fail if duplicate configuration of paired tokens ", async function () {
