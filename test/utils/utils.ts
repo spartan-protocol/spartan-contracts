@@ -23,6 +23,7 @@ export const oneThousand = "1000000000000000000000";
 export const tenThousand = "10000000000000000000000";
 export const oneHundredThousand = "100000000000000000000000";
 export const oneMillion = "1000000000000000000000000";
+export const burnLiq = one;
 
 // Contract object helpers
 export const connectToContract = async (

@@ -4,6 +4,7 @@ import "./interfaces/iSPARTA.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./interfaces/iHandler.sol";
 
+// TODO: Change math to simple/symbol style (newer solidity version)
 contract Tools {
     using SafeMath for uint256;
     address public immutable SPARTA; // SPARTA  contract address
@@ -15,20 +16,6 @@ contract Tools {
 
     function HandlerAddr() internal view returns (iHandler) {
         return iSPARTA(SPARTA).handlerAddr();
-    }
-
-    // babylonian method (https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Babylonian_method)
-    function sqrt(uint256 y) internal pure returns (uint256 z) {
-        if (y > 3) {
-            z = y;
-            uint256 x = y / 2 + 1;
-            while (x < z) {
-                z = x;
-                x = (y / x + x) / 2;
-            }
-        } else if (y != 0) {
-            z = 1;
-        }
     }
 
     function calcLiquidityUnits(

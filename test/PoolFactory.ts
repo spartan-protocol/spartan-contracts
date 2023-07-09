@@ -3,6 +3,7 @@ import { expect } from "chai";
 import {
   bnbCexHW6,
   btcbAddr,
+  burnLiq,
   busdAddr,
   connectToContract,
   getTokenBal,
@@ -19,6 +20,7 @@ import {
   zeroAddr,
 } from "./utils/utils";
 import BigNumber from "bignumber.js";
+import { calcLiquidityUnits } from "./maths";
 
 const {
   loadFixture,
@@ -132,6 +134,7 @@ describe("AMM Contracts Suite", function () {
       busdAsAddr1,
       usdtAsAddr1,
       btcbAsAddr1,
+      protocolToken,
     };
   }
 
@@ -144,6 +147,7 @@ describe("AMM Contracts Suite", function () {
       busdAsAddr1,
       usdtAsAddr1,
       btcbAsAddr1,
+      protocolToken,
     } = await loadFixture(deployFixture);
 
     /* Deploy Contracts */
@@ -192,6 +196,7 @@ describe("AMM Contracts Suite", function () {
       btcbAsAddr1,
       stablePoolAddr,
       nativePoolAddr,
+      protocolToken,
     };
   }
 
@@ -295,34 +300,67 @@ describe("AMM Contracts Suite", function () {
       });
 
       it("User & burn address should receive the correct share of initial LP units", async function () {
-        // const input1 = oneThousand;
-        // const input2 = oneHundred;
-        // const { poolFactory, addr1, busdAsAddr1, usdtAsAddr1 } =
-        //   await loadFixture(deployFixture);
-        // // Get user balances before txn
-        // const addr1BusdBalBefore = await getTokenBal(busdAsAddr1, addr1);
-        // const addr1UsdtBalBefore = await getTokenBal(usdtAsAddr1, addr1);
-        // // Perform approvals
-        // await busdAsAddr1.approve(poolFactory.target, tenThousand);
-        // await usdtAsAddr1.approve(poolFactory.target, tenThousand);
-        // // Deploy the pool & get it's address
-        // await poolFactory
-        //   .connect(addr1)
-        //   .createPool(input1, input2, busdAddr, usdtAddr);
-        // const poolAddr = await poolFactory.getPool(busdAddr, usdtAddr);
-        // // Get user & pool balances after txn
-        // const addr1BusdBal = await getTokenBal(busdAsAddr1, addr1);
-        // const poolBusdBal = await getTokenBal(busdAsAddr1, poolAddr);
-        // const addr1UsdtBal = await getTokenBal(usdtAsAddr1, addr1);
-        // const poolUsdtBal = await getTokenBal(usdtAsAddr1, poolAddr);
-        // // Expected user & pool balances after txn
-        // const addr1BusdExp = BigNumber(addr1BusdBalBefore).minus(input1);
-        // const addr1UsdtExp = BigNumber(addr1UsdtBalBefore).minus(input2);
-        // // console.log("DEBUG:", addr1BusdBal, addr1BusdExp.toFixed(0));
-        // expect(addr1BusdBal).to.equal(addr1BusdExp.toFixed(0));
-        // expect(poolBusdBal).to.equal(input1);
-        // expect(addr1UsdtBal).to.equal(addr1UsdtExp.toFixed(0));
-        // expect(poolUsdtBal).to.equal(input2);
+        const { addr1, stablePoolAddr, nativePoolAddr, protocolToken } =
+          await createPoolsFixture(true, true);
+        const burnAddr = protocolToken.target;
+        const stablePoolAsAddr1 = await connectToContract(
+          "iBEP20",
+          stablePoolAddr,
+          addr1
+        );
+        const nativePoolAsAddr1 = await connectToContract(
+          "iBEP20",
+          nativePoolAddr,
+          addr1
+        );
+
+        // Get user balances after txn
+        const addr1StableLpBal = await getTokenBal(stablePoolAsAddr1, addr1);
+        const addr1NativeLpBal = await getTokenBal(nativePoolAsAddr1, addr1);
+
+        // Get burnAddr balances after txn
+        const burnedStableLpBal = await getTokenBal(
+          stablePoolAsAddr1,
+          burnAddr
+        );
+        const burnedNativeLpBal = await getTokenBal(
+          nativePoolAsAddr1,
+          burnAddr
+        );
+
+        // Total LP units minted
+        const totalStableLps = calcLiquidityUnits(
+          stablePoolInput1,
+          "0",
+          stablePoolInput2,
+          "0",
+          "0"
+        );
+        const totalNativeLps = calcLiquidityUnits(
+          nativePoolInput1,
+          "0",
+          nativePoolInput2,
+          "0",
+          "0"
+        );
+
+        // Expected locked/burned balances after txn are === burnLiq
+        const burnedStableLpExp = burnLiq;
+        const burnedNativeLpExp = burnLiq;
+
+        // Expected user balances after txn
+        const addr1StableLpExp =
+          BigNumber(totalStableLps).minus(burnedStableLpExp);
+        const addr1NativeLpExp =
+          BigNumber(totalNativeLps).minus(burnedNativeLpExp);
+
+        // Run burned balance checks
+        expect(burnedStableLpBal).to.equal(burnedStableLpExp);
+        expect(burnedNativeLpBal).to.equal(burnedNativeLpExp);
+
+        // Run addr1 balance checks
+        expect(addr1StableLpBal).to.equal(addr1StableLpExp.toFixed(0));
+        expect(addr1NativeLpBal).to.equal(addr1NativeLpExp.toFixed(0));
       });
     });
 

@@ -5,7 +5,6 @@ import "./interfaces/iHandler.sol"; // TODO: Remove this *if we remove iTools*
 import "./interfaces/iSPARTA.sol";
 import "./interfaces/iTools.sol"; // TODO: Consider moving this inside pool contract if we want it immutable
 // Libraries | Contracts
-import "./utils/Math.sol"; // TODO: Consider moving this single library function inside (zero effect on contract size)
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -99,11 +98,11 @@ contract Pool is ERC20, ReentrancyGuard {
         require(inputAsset1 > 0 && inputAsset2 > 0, "!In1");
 
         if (totalSupply() == 0) {
-            uint minLiquidity = 10 ** 3;
-            liquidity = Math.sqrt(inputAsset1 * inputAsset2) - minLiquidity;
-            _mint(protocolTokenAddr, minLiquidity); // permanently lock the first minLiquidity tokens
+            uint burnLiq = 1 ether; // Burn/lock portion (0.0001%)
+            liquidity = 9999 ether; // Pool creator's portion (99.9999%)
+            _mint(protocolTokenAddr, burnLiq); // Perma-lock some tokens to resist empty pool || wei rounding issues
         } else {
-            // TODO: Consider moving this math into this contract if we want it trustless/immutable
+            // TODO: Consider moving the Tools math into this contract if we want it trustless/immutable
             liquidity = iTools(_Handler().toolsAddr()).calcLiquidityUnits(
                 inputAsset1,
                 _asset1Depth,
