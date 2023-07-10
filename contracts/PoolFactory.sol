@@ -34,6 +34,8 @@ contract PoolFactory {
         address newToken1Addr,
         address newToken2Addr
     ) external payable returns (address newPoolAddr) {
+        require(newToken1Input > 10 ** 5, "Input1!>100000"); // Enforce a minimum initial balance (resist wei rounding attacks)
+        require(newToken2Input > 10 ** 5, "Input2!>100000"); // Enforce a minimum initial balance (resist wei rounding attacks)
         address token1Addr = newToken1Addr; // Cache selected token1 address
         address token2Addr = newToken2Addr; // Cache selected token2 address
         if (token1Addr == address(0)) {

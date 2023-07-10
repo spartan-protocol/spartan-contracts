@@ -21,6 +21,7 @@ import {
 } from "./utils/utils";
 import BigNumber from "bignumber.js";
 import { calcLiquidityUnits } from "./maths";
+import { ZeroAddress } from "ethers";
 
 const {
   loadFixture,
@@ -202,6 +203,20 @@ describe("AMM Contracts Suite", function () {
 
   describe("🏭 Pool Factory Contract", function () {
     describe("createPool() checks", function () {
+      it("Pool deploy should fail if either inputs are !> 100k wei", async function () {
+        const { poolFactory, addr1 } = await loadFixture(deployFixture);
+        await expect(
+          poolFactory
+            .connect(addr1)
+            .createPool("100000", oneHundred, busdAddr, zeroAddr)
+        ).to.be.revertedWith("Input1!>100000");
+        await expect(
+          poolFactory
+            .connect(addr1)
+            .createPool(oneHundred, "100000", busdAddr, zeroAddr)
+        ).to.be.revertedWith("Input2!>100000");
+      });
+
       it("Pool deploy should fail if token1 & token2 are the same", async function () {
         const { poolFactory, addr1 } = await loadFixture(deployFixture);
         await expect(
@@ -361,6 +376,94 @@ describe("AMM Contracts Suite", function () {
         // Run addr1 balance checks
         expect(addr1StableLpBal).to.equal(addr1StableLpExp.toFixed(0));
         expect(addr1NativeLpBal).to.equal(addr1NativeLpExp.toFixed(0));
+      });
+    });
+
+    describe("createPool() events", function () {
+      it("Should emit PoolCreated event", async function () {
+        const { poolFactory, addr1, busdAsAddr1, usdtAsAddr1, btcbAsAddr1 } =
+          await loadFixture(deployFixture);
+
+        await busdAsAddr1.approve(poolFactory.target, oneMillion);
+        await usdtAsAddr1.approve(poolFactory.target, oneMillion);
+        await btcbAsAddr1.approve(poolFactory.target, oneMillion);
+
+        let _token1Addr = stablePoolToken1;
+        let _token2Addr = stablePoolToken2;
+        if (stablePoolToken1 == ZeroAddress) {
+          _token1Addr = wrapAddr; // Translate token1 native->wrapped address
+        }
+        if (stablePoolToken2 == ZeroAddress) {
+          _token2Addr = wrapAddr; // Translate token2 native->wrapped address
+        }
+
+        if (_token1Addr > _token2Addr) {
+          const _addr1 = _token1Addr; // Cache address
+          _token1Addr = _token2Addr; // Swap token1<>token2 addresses ...
+          _token2Addr = _addr1; // ... into hexadecimal value order
+        }
+
+        let tx1 = await poolFactory
+          .connect(addr1)
+          .createPool(
+            stablePoolInput1,
+            stablePoolInput2,
+            stablePoolToken1,
+            stablePoolToken2
+          );
+        tx1 = await tx1.wait();
+        tx1 = tx1.logs.filter(
+          (x: any) => x.fragment && x.fragment.name === "PoolCreated"
+        )[0];
+        // console.log(tx1);
+
+        const stablePoolAddr = await poolFactory.getPool(
+          stablePoolToken1,
+          stablePoolToken2
+        );
+
+        expect(tx1.args[0]).to.equal(_token1Addr);
+        expect(tx1.args[1]).to.equal(_token2Addr);
+        expect(tx1.args[2]).to.equal(stablePoolAddr);
+
+        let _token3Addr = nativePoolToken1;
+        let _token4Addr = nativePoolToken2;
+        if (nativePoolToken1 == ZeroAddress) {
+          _token3Addr = wrapAddr; // Translate token1 native->wrapped address
+        }
+        if (nativePoolToken2 == ZeroAddress) {
+          _token4Addr = wrapAddr; // Translate token2 native->wrapped address
+        }
+
+        if (_token3Addr > _token4Addr) {
+          const _addr3 = _token3Addr; // Cache address
+          _token3Addr = _token4Addr; // Swap token1<>token2 addresses ...
+          _token4Addr = _addr3; // ... into hexadecimal value order
+        }
+
+        let tx2 = await poolFactory
+          .connect(addr1)
+          .createPool(
+            nativePoolInput1,
+            nativePoolInput2,
+            nativePoolToken1,
+            nativePoolToken2,
+            { value: nativePoolInput1 }
+          );
+        tx2 = await tx2.wait();
+        tx2 = tx2.logs.filter(
+          (x: any) => x.fragment && x.fragment.name === "PoolCreated"
+        )[0];
+        // console.log(tx2);
+
+        const nativePoolAddr = await poolFactory.getPool(
+          wrapAddr,
+          nativePoolToken2
+        );
+
+        expect(tx2.args[0]).to.equal(_token3Addr);
+        expect(tx2.args[1]).to.equal(_token4Addr);
+        expect(tx2.args[2]).to.equal(nativePoolAddr);
       });
     });
 
