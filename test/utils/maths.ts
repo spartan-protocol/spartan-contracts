@@ -1,5 +1,5 @@
 import { BigNumber } from "bignumber.js";
-import { oneHundred, tenThousand } from "./utils/utils";
+import { oneHundred, tenThousand } from "./utils";
 
 BigNumber.config({ DECIMAL_PLACES: 0 });
 BigNumber.config({ ROUNDING_MODE: 1 });

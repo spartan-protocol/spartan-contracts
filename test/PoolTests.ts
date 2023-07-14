@@ -1,4 +1,3 @@
-import { PoolFactory } from "../typechain-types/contracts/PoolFactory";
 import hre from "hardhat";
 import { expect } from "chai";
 import {
@@ -14,15 +13,12 @@ import {
   oneMillion,
   oneThousand,
   spartaAddr,
-  ten,
-  tenThousand,
-  twoHundred,
   usdtAddr,
   wbnbAddr,
   zeroAddr,
 } from "./utils/utils";
 import BigNumber from "bignumber.js";
-import { calcLiquidityUnits } from "./maths";
+import { calcLiquidityUnits } from "./utils/maths";
 import { ZeroAddress } from "ethers";
 
 const {
