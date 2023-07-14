@@ -58,7 +58,7 @@ export const calcLiquidityUnits = (
     );
     const part1 = t1In.times(t2Depth);
     const part2 = t2In.times(t1Depth);
-    const part3 = t2In.times(t2Depth).times("2");
+    const part3 = t1Depth.times(t2Depth).times("2");
     const units = lpUnits.times(part1.plus(part2)).div(part3);
     return units.times(slipAdjustment).div(one); // Divide by 10**18;
   }

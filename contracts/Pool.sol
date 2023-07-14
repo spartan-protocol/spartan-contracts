@@ -92,12 +92,14 @@ contract Pool is ERC20, ReentrancyGuard {
     ) external nonReentrant returns (uint liquidity) {
         uint current1Balance = IERC20(asset1Addr).balanceOf(address(this));
         uint current2Balance = IERC20(asset2Addr).balanceOf(address(this));
+        // TODO: Decide whether to cache _asset1Depth && _asset2Depth
         uint256 inputAsset1 = current1Balance - _asset1Depth;
         uint256 inputAsset2 = current2Balance - _asset2Depth;
 
         require(inputAsset1 > 0 && inputAsset2 > 0, "!In1");
 
-        if (totalSupply() == 0) {
+        uint _totalSupply = totalSupply();
+        if (_totalSupply == 0) {
             uint burnLiq = 1 ether; // Burn/lock portion (0.0001%)
             liquidity = 9999 ether; // Pool creator's portion (99.9999%)
             _mint(protocolTokenAddr, burnLiq); // Perma-lock some tokens to resist empty pool || wei rounding issues
@@ -108,7 +110,7 @@ contract Pool is ERC20, ReentrancyGuard {
                 _asset1Depth,
                 inputAsset2,
                 _asset2Depth,
-                totalSupply()
+                _totalSupply
             ); // Calculate liquidity tokens to mint
         }
 

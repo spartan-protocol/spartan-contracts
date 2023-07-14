@@ -1,5 +1,5 @@
 import { Contract, Signer } from "ethers";
-import { ethers } from "hardhat";
+import hre from "hardhat";
 
 // Token Addresses
 export const zeroAddr = "0x0000000000000000000000000000000000000000"; // Zero Address
@@ -31,7 +31,7 @@ export const connectToContract = async (
   contractAddress: string,
   signer: Signer
 ) => {
-  const contract = await ethers.getContractAt(
+  const contract = await hre.ethers.getContractAt(
     contractIdString,
     contractAddress,
     signer

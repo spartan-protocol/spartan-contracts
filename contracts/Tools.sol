@@ -8,7 +8,6 @@ import "./interfaces/iHandler.sol";
 contract Tools {
     using SafeMath for uint256;
     address public immutable SPARTA; // SPARTA  contract address
-    uint256 private constant ONE = 10 ** 18;
 
     constructor(address _base) {
         SPARTA = _base;
@@ -26,7 +25,7 @@ contract Tools {
         uint256 totalSupply
     ) external pure returns (uint256 liquidityUnits) {
         if (totalSupply == 0) {
-            return token1Input; // If pool is empty; use token1Input as initial units
+            return 10000; // If pool is empty; use 10000 as initial units
         } else {
             // units = ((P (t B + T b))/(2 T B)) * slipAdjustment
             // P * (part1 + part2) / (part3) * slipAdjustment
@@ -36,13 +35,14 @@ contract Tools {
                 token2Input,
                 token2Depth
             );
-            require(slipAdjustment > ONE, "Slip adjustment too small");
-            uint256 part1 = token1Input.mul(token2Depth);
-            uint256 part2 = token2Input.mul(token1Depth);
-            uint256 part3 = token2Depth.mul(2).add(token2Input);
-            require(part3 > 0, "Division by zero");
-            uint256 units = totalSupply.mul(part1.add(part2)).div(part3);
-            return units.mul(slipAdjustment).div(ONE);
+            // Prevent asym-adds that manipulate the pool by more than ~1%
+            require(slipAdjustment > (0.98 ether), "!Asym");
+            uint256 part1 = token1Input * token2Depth;
+            uint256 part2 = token2Input * token1Depth;
+            uint256 part3 = token2Depth * token1Depth * 2;
+            require(part3 > 0, "!DivBy0");
+            uint256 units = (totalSupply * (part1 + part2)) / (part3);
+            return (units * slipAdjustment) / 1 ether;
         }
     }
 
@@ -53,20 +53,19 @@ contract Tools {
         uint256 token2Depth
     ) public pure returns (uint256 slipAdjustment) {
         // slipAdjustment = (1 - ABS((B t - b T)/((2 b + B) (t + T))))
-        uint256 part1 = token1Depth.mul(token2Input);
-        uint256 part2 = token2Depth.mul(token1Input);
+        uint256 numPart1 = token1Depth * token2Input;
+        uint256 numPart2 = token2Depth * token1Input;
         uint256 numerator;
-        if (part1 > part2) {
-            numerator = part1.sub(part2);
+        if (numPart1 > numPart2) {
+            numerator = numPart1 - numPart2;
         } else {
-            numerator = part2.sub(part1);
+            numerator = numPart2 - numPart1;
         }
-        uint256 denominator = token2Depth.mul(2).add(token2Input).mul(
-            token1Depth.add(token2Depth)
-        );
-        if (denominator == 0) {
-            return ONE;
-        }
-        return ONE.sub(numerator.mul(ONE).div(denominator));
+
+        uint256 denomPart1 = 2 * token1Input + token1Depth;
+        uint256 denomPart2 = token2Input + token2Depth;
+        uint256 denominator = denomPart1 * denomPart2;
+        require(denominator > 0, "!Div0");
+        return 1 ether - ((numerator * 1 ether) / denominator);
     }
 }
