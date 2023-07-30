@@ -46,6 +46,30 @@ contract Tools {
         }
     }
 
+    // TODO: Trying an adjusted calcUnits without need for slip adjustment hopefully
+    // TODO: This needs major testing, just an incomplete placehodler for now
+    function calcLiquidityUnitsNewTest(
+        uint256 token1Input,
+        uint256 token1Depth,
+        uint256 token2Input,
+        uint256 token2Depth,
+        uint256 totalSupply
+    ) external pure returns (uint256 liquidityUnits) {
+        if (totalSupply == 0) {
+            return 10000; // If pool is empty; use 10000 as initial units
+        } else {
+            // numer = tB + Tb + 2tb
+            // denom = tB + Tb + 2TB
+            // units = P * (numer / denom)
+            uint256 part1 = (token1Input * token2Depth) +
+                (token2Input * token1Depth);
+            uint256 part2 = 2 * token1Input * token2Input;
+            uint256 denom = part1 + (token1Depth * token2Depth);
+            require(denom > 0, "!DivBy0");
+            return totalSupply * ((part1 + part2) / denom);
+        }
+    }
+
     function getSlipAdjustment(
         uint256 token1Input,
         uint256 token1Depth,

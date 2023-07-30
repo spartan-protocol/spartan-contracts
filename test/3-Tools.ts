@@ -54,13 +54,13 @@ describe("🏊‍♀️ Tools Contract", function () {
 
       const addStable1 = BigNumber(stablePoolInput1).toFixed(0);
       const addStable2 = BigNumber(stablePoolInput1).times("0.85").toFixed(0);
-      // const slipadj = getSlipAdustment(
-      //   addStable1,
-      //   stablePoolInput1,
-      //   addStable2,
-      //   stablePoolInput2
-      // );
-      // console.log(slipadj.toFixed(0)); // ~0.9729 eth
+      const slipadj = getSlipAdustment(
+        addStable1,
+        stablePoolInput1,
+        addStable2,
+        stablePoolInput2
+      );
+      console.log(slipadj.toFixed(0)); // ~0.9729 eth
 
       await busdAsAddr2.transfer(stablePoolAsAddr2.target, addStable1);
       await usdtAsAddr2.transfer(stablePoolAsAddr2.target, addStable2);

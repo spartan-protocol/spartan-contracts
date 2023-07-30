@@ -33,6 +33,31 @@ const BN = (valueForBigNumber: string | number | BigNumber) => {
 //   return y;
 // }
 
+// TODO: Trying an adjusted calcUnits without need for slip adjustment hopefully
+// TODO: This needs major testing, just an incomplete placehodler for now
+export const calcLiquidityUnitsNewTest = (
+  token1Input: string,
+  token1Depth: string,
+  token2Input: string,
+  token2Depth: string,
+  lpUnitSupply: string
+) => {
+  const t1In = BN(token1Input);
+  const t2In = BN(token2Input);
+  const t1Depth = BN(token1Depth);
+  const t2Depth = BN(token2Depth);
+  const lpUnits = BN(lpUnitSupply);
+  if (lpUnits.isEqualTo("0")) {
+    return tenThousand;
+  } else {
+    // SEE: Tools.calcLiquidityUnitsNewTest()
+    const part1 = t1In.times(t2Depth).plus(t2In.times(t1Depth));
+    const part2 = BN("2").times(token1Input).times(token2Input);
+    const denom = part1.plus(t1Depth.times(t2Depth));
+    return lpUnits.times(part1.plus(part2).div(denom));
+  }
+};
+
 export const calcLiquidityUnits = (
   token1Input: string,
   token1Depth: string,
