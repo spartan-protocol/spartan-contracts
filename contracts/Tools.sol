@@ -1,13 +1,14 @@
 //SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
-import "./interfaces/iSPARTA.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+// Interfaces
 import "./interfaces/iHandler.sol";
+import "./interfaces/iSPARTA.sol";
+// Libraries | Contracts
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-// TODO: Change math to simple/symbol style (newer solidity version)
 contract Tools {
     using SafeMath for uint256;
-    address public immutable SPARTA; // SPARTA  contract address
+    address public immutable SPARTA; // SPARTA contract address
 
     constructor(address _base) {
         SPARTA = _base;
@@ -35,8 +36,7 @@ contract Tools {
                 token2Input,
                 token2Depth
             );
-            // Prevent asym-adds that manipulate the pool by more than ~1%
-            require(slipAdjustment > (0.98 ether), "!Asym");
+            require(slipAdjustment > (0.98 ether), "!Asym"); // Resist asym-adds
             uint256 part1 = token1Input * token2Depth;
             uint256 part2 = token2Input * token1Depth;
             uint256 part3 = token2Depth * token1Depth * 2;

@@ -64,12 +64,12 @@ export const calcLiquidityUnits = (
   }
 };
 
-function getSlipAdustment(
+export const getSlipAdustment = (
   token1Input: string,
   token1Depth: string,
   token2Input: string,
   token2Depth: string
-) {
+) => {
   // slipAdjustment = (1 - ABS((B t - b T)/((2 b + B) (t + T))))
   // 1 - ABS(part1 - part2)/(part3 * part4))
   const t1In = BN(token1Input);
@@ -89,7 +89,7 @@ function getSlipAdustment(
   }
   const denominator = part3.times(part4);
   return one.minus(numerator.times(one).div(denominator));
-}
+};
 
 // function calcAsymmetricShare(s, T, A) {
 //   // share = (s * A * (2 * T^2 - 2 * T * s + s^2))/T^3
