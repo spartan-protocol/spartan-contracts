@@ -61,12 +61,14 @@ contract Tools {
             // numer = tB + Tb + 2tb
             // denom = tB + Tb + 2TB
             // units = P * (numer / denom)
+            // Make division last (solidity woes) adapts to:
+            // units = (P * numer) / denom
             uint256 part1 = (token1Input * token2Depth) +
                 (token2Input * token1Depth);
             uint256 part2 = 2 * token1Input * token2Input;
             uint256 denom = part1 + (2 * token1Depth * token2Depth);
             require(denom > 0, "!DivBy0");
-            return totalSupply * ((part1 + part2) / denom);
+            return (totalSupply * (part1 + part2)) / denom;
         }
     }
 

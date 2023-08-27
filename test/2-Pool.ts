@@ -1,30 +1,6 @@
 import { expect } from "chai";
-import {
-  burnLiq,
-  busdAddr,
-  getTokenBal,
-  oneHundred,
-  oneMillion,
-  oneThousand,
-  zeroAddr,
-} from "./utils/utils";
-import BigNumber from "bignumber.js";
-import { calcLiquidityUnits } from "./utils/maths";
-import { ZeroAddress } from "ethers";
-import { createPoolsFixture, deployFixture } from "./0-Fixtures";
-import {
-  nativePoolInput1,
-  nativePoolInput2,
-  nativePoolToken1,
-  nativePoolToken2,
-  stablePoolInput1,
-  stablePoolInput2,
-  stablePoolToken1,
-  stablePoolToken2,
-  startBalanceBtc,
-  startBalanceStables,
-  wrapAddr,
-} from "./utils/variables";
+import { oneHundred, oneMillion } from "./utils/utils";
+import { createPoolsFixture } from "./0-Fixtures";
 
 const {
   loadFixture,
@@ -145,6 +121,84 @@ describe("🏊‍♀️ Pool Contract", function () {
   });
 
   describe("() balances", function () {
+    it("Both calcLiqUnits formulas should return the same LP Units", async function () {
+      const {
+        addr2,
+        stablePoolAsAddr2,
+        nativePoolAsAddr2,
+        busdAsAddr2,
+        usdtAsAddr2,
+        btcbAsAddr2,
+      } = await loadFixture(createPoolsFixture);
+
+      // Get approvals
+      await busdAsAddr2.approve(stablePoolAsAddr2.target, oneMillion);
+      await usdtAsAddr2.approve(stablePoolAsAddr2.target, oneMillion);
+      await btcbAsAddr2.approve(nativePoolAsAddr2.target, oneMillion);
+
+      // #1
+      await busdAsAddr2.transfer(stablePoolAsAddr2.target, oneHundred);
+      await usdtAsAddr2.transfer(stablePoolAsAddr2.target, oneHundred);
+      // StaticCall symmetrical addForMember()
+      // Cache returned LP units
+      const lpUnitsRecOld1 = await stablePoolAsAddr2.addForMember.staticCall(
+        addr2
+      );
+      console.log(lpUnitsRecOld1.toString());
+      // StaticCall symmetrical addForMemberNewTest()
+      // Cache returned LP units
+      const lpUnitsRecNew1 =
+        await stablePoolAsAddr2.addForMemberNewTest.staticCall(addr2);
+      console.log(lpUnitsRecNew1.toString());
+      // Ensure the amounts are equal
+      expect(lpUnitsRecOld1).to.equal(lpUnitsRecNew1);
+      // Write-txn symmetrical addForMemberNewTest()
+      await stablePoolAsAddr2.addForMemberNewTest(addr2);
+
+      // #2
+      // Do some swaps to misbalance pools
+
+      // #3
+      // StaticCall symmetrical addForMember()
+      // Cache returned LP units
+      // Write-txn symmetrical addForMemberNewTest()
+      // Cache returned LP units
+      // Ensure the amounts are equal
+
+      // #4
+      // Do some swaps to re-balance pools to same rate as pre-#2
+
+      // #5
+      // Write-txn removeLiquidity(LP units === #1 received)
+      // Cache returned assets
+      // Ensure the returned units are === units deposited in #1
+
+      // #6
+      // StaticCall asymmetric addForMember()
+      // Cache returned LP units
+      // Write-txn asymmetric addForMemberNewTest()
+      // Cache returned LP units
+      // Ensure the amounts are equal
+
+      // #7
+      // Do some swaps to misbalance pools
+
+      // #8
+      // StaticCall asymmetric addForMember()
+      // Cache returned LP units
+      // Write-txn asymmetric addForMemberNewTest()
+      // Cache returned LP units
+      // Ensure the amounts are equal
+
+      // #9
+      // Do some swaps to re-balance pools to same rate as pre-#7
+
+      // #10
+      // Write-txn removeLiquidity(LP units === #6 received)
+      // Cache returned assets
+      // Ensure the returned units are === units deposited in #6
+    });
+
     // it("Pool and user balances must change by correct amounts", async function () {
     //   const {
     //     addr1,

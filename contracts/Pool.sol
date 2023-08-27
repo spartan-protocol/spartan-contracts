@@ -124,6 +124,45 @@ contract Pool is ERC20, ReentrancyGuard {
         emit Mint(msg.sender, inputAsset1, inputAsset2);
     }
 
+    // Contract adds liquidity for user
+    function addForMemberNewTest(
+        address to
+    ) external nonReentrant returns (uint liquidity) {
+        uint current1Balance = IERC20(asset1Addr).balanceOf(address(this));
+        uint current2Balance = IERC20(asset2Addr).balanceOf(address(this));
+        // TODO: Decide whether to cache _asset1Depth && _asset2Depth
+        uint256 inputAsset1 = current1Balance - _asset1Depth;
+        uint256 inputAsset2 = current2Balance - _asset2Depth;
+
+        require(inputAsset1 > 0 && inputAsset2 > 0, "!In1");
+
+        uint _totalSupply = totalSupply();
+        if (_totalSupply == 0) {
+            uint burnLiq = 1 ether; // Burn/lock portion (0.0001%)
+            liquidity = 9999 ether; // Pool creator's portion (99.9999%)
+            _mint(protocolTokenAddr, burnLiq); // Perma-lock some tokens to resist empty pool || wei rounding issues
+        } else {
+            // TODO: Consider moving the Tools math into this contract if we want it trustless/immutable
+            liquidity = iTools(_Handler().toolsAddr())
+                .calcLiquidityUnitsNewTest(
+                    inputAsset1,
+                    _asset1Depth,
+                    inputAsset2,
+                    _asset2Depth,
+                    _totalSupply
+                ); // Calculate liquidity tokens to mint
+        }
+
+        require(liquidity > 0, "!Liq1");
+
+        _mint(to, liquidity);
+
+        _asset1Depth = current1Balance; // update reserves
+        _asset2Depth = current2Balance; // update reserves
+
+        emit Mint(msg.sender, inputAsset1, inputAsset2);
+    }
+
     // Contract removes liquidity for user
     function removeLiquidity(
         uint liquidity

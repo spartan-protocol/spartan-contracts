@@ -1,34 +1,9 @@
 import { expect } from "chai";
-import {
-  burnLiq,
-  busdAddr,
-  getTokenBal,
-  one,
-  oneHundred,
-  oneHundredThousand,
-  oneMillion,
-  oneThousand,
-  tenThousand,
-  two,
-  zeroAddr,
-} from "./utils/utils";
+import { oneMillion } from "./utils/utils";
 import BigNumber from "bignumber.js";
-import { calcLiquidityUnits, getSlipAdustment } from "./utils/maths";
-import { ZeroAddress } from "ethers";
-import { createPoolsFixture, deployFixture } from "./0-Fixtures";
-import {
-  nativePoolInput1,
-  nativePoolInput2,
-  nativePoolToken1,
-  nativePoolToken2,
-  stablePoolInput1,
-  stablePoolInput2,
-  stablePoolToken1,
-  stablePoolToken2,
-  startBalanceBtc,
-  startBalanceStables,
-  wrapAddr,
-} from "./utils/variables";
+import { getSlipAdustment } from "./utils/maths";
+import { createPoolsFixture } from "./0-Fixtures";
+import { stablePoolInput1, stablePoolInput2 } from "./utils/variables";
 
 const {
   loadFixture,
@@ -60,7 +35,7 @@ describe("🏊‍♀️ Tools Contract", function () {
         addStable2,
         stablePoolInput2
       );
-      console.log(slipadj.toFixed(0)); // ~0.9729 eth
+      // console.log(slipadj.toFixed(0)); // ~0.9729 eth
 
       await busdAsAddr2.transfer(stablePoolAsAddr2.target, addStable1);
       await usdtAsAddr2.transfer(stablePoolAsAddr2.target, addStable2);
