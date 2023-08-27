@@ -53,7 +53,7 @@ export const calcLiquidityUnitsNewTest = (
     // SEE: Tools.calcLiquidityUnitsNewTest()
     const part1 = t1In.times(t2Depth).plus(t2In.times(t1Depth));
     const part2 = BN("2").times(token1Input).times(token2Input);
-    const denom = part1.plus(t1Depth.times(t2Depth));
+    const denom = part1.plus(BN("2").times(t1Depth).times(t2Depth));
     return lpUnits.times(part1.plus(part2).div(denom));
   }
 };

@@ -64,7 +64,7 @@ contract Tools {
             uint256 part1 = (token1Input * token2Depth) +
                 (token2Input * token1Depth);
             uint256 part2 = 2 * token1Input * token2Input;
-            uint256 denom = part1 + (token1Depth * token2Depth);
+            uint256 denom = part1 + (2 * token1Depth * token2Depth);
             require(denom > 0, "!DivBy0");
             return totalSupply * ((part1 + part2) / denom);
         }
