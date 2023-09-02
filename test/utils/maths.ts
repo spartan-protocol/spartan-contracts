@@ -1,8 +1,6 @@
 import { BigNumber } from "bignumber.js";
 import { oneHundred, tenThousand } from "./utils";
 
-BigNumber.config({ DECIMAL_PLACES: 0 });
-BigNumber.config({ ROUNDING_MODE: 1 });
 const one = new BigNumber(1 * 10 ** 18);
 
 const BN = (valueForBigNumber: string | number | BigNumber) => {

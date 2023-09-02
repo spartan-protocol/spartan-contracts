@@ -21,10 +21,13 @@ import {
   startBalanceStables,
   wrapAddr,
 } from "./utils/variables";
+import BigNumber from "bignumber.js";
 
 const {
   loadFixture,
 } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
+
+BigNumber.config({ EXPONENTIAL_AT: 1e+9 });
 
 export const deployFixture = async () => {
   /* Contracts are deployed using the first signer/account (ie. 'owner') by default */
@@ -81,6 +84,10 @@ export const deployFixture = async () => {
     protocolToken.target,
   ]);
   await poolFactory.waitForDeployment();
+  const testHelpers = await hre.ethers.deployContract("TestHelpers", [
+    wrapAddr,
+  ]);
+  await testHelpers.waitForDeployment();
   const tools = await hre.ethers.deployContract("Tools", [
     protocolToken.target,
   ]);
@@ -121,6 +128,7 @@ export const deployFixture = async () => {
 
   return {
     poolFactory,
+    testHelpers,
     owner,
     addr1,
     addr2,
@@ -137,6 +145,7 @@ export const deployFixture = async () => {
 export const createPoolsFixture = async () => {
   const {
     poolFactory,
+    testHelpers,
     owner,
     addr1,
     addr2,
@@ -202,6 +211,7 @@ export const createPoolsFixture = async () => {
 
   return {
     poolFactory,
+    testHelpers,
     owner,
     addr1,
     addr2,

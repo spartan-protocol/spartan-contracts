@@ -6,8 +6,6 @@ Such as Bignumbers
 */
 
 var BigNumber = require("bignumber.js");
-BigNumber.config({ DECIMAL_PLACES: 0 });
-BigNumber.config({ ROUNDING_MODE: 1 });
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 const one = 10 ** 18;

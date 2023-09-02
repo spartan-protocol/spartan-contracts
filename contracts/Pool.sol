@@ -134,7 +134,7 @@ contract Pool is ERC20, ReentrancyGuard {
         uint256 inputAsset1 = current1Balance - _asset1Depth;
         uint256 inputAsset2 = current2Balance - _asset2Depth;
 
-        require(inputAsset1 > 0 && inputAsset2 > 0, "!In1");
+        require(inputAsset1 > 0 || inputAsset2 > 0, "!In1");
 
         uint _totalSupply = totalSupply();
         if (_totalSupply == 0) {
@@ -170,14 +170,12 @@ contract Pool is ERC20, ReentrancyGuard {
         require(liquidity > 0, "!In2");
         uint totalLiquidity = totalSupply();
         require(totalLiquidity > 0, "!Liq2");
-        (uint current1Balance, uint current2Balance) = (
-            IERC20(asset1Addr).balanceOf(address(this)),
-            IERC20(asset2Addr).balanceOf(address(this))
-        );
+        uint asset1Bal = IERC20(asset1Addr).balanceOf(address(this));
+        uint asset2Bal = IERC20(asset2Addr).balanceOf(address(this));
         // TODO: Check math and make the math-code more readable / clear
         uint256 liquidityPercentage = (liquidity * (1e18)) / (totalLiquidity);
-        asset1Amount = (current1Balance * (liquidityPercentage)) / (1e18);
-        asset2Amount = (current2Balance * (liquidityPercentage)) / (1e18);
+        asset1Amount = (asset1Bal * (liquidityPercentage)) / (1e18);
+        asset2Amount = (asset2Bal * (liquidityPercentage)) / (1e18);
         require(asset1Amount > 0 && asset2Amount > 0, "!Out2");
         _burn(msg.sender, liquidity);
 
@@ -188,43 +186,110 @@ contract Pool is ERC20, ReentrancyGuard {
         emit Burn(msg.sender, asset1Amount, asset2Amount, liquidity);
     }
 
-    function swapToken(
-        address inputToken,
-        address outputToken,
-        uint256 inputAmount
-    ) external nonReentrant returns (uint256 outputAmount) {
-        require(inputToken != outputToken, "!Same3");
+    function swapToken() external nonReentrant returns (uint256 outputAmount) {
+        address _asset1Addr = asset1Addr;
+        address _asset2Addr = asset2Addr;
+        uint256 asset1Depth = _asset1Depth;
+        uint256 asset2Depth = _asset2Depth;
+        require(asset1Depth > 0 && asset2Depth > 0, "!Liq3");
 
-        (uint256 inputTokenDepth, uint256 outputTokenDepth) = getReserves();
-        require(inputTokenDepth > 0 && outputTokenDepth > 0, "!Liq3");
+        uint256 asset1TokenBal = IERC20(_asset1Addr).balanceOf(address(this));
+        uint256 asset2TokenBal = IERC20(_asset2Addr).balanceOf(address(this));
 
-        uint256 outputTokenBalance = IERC20(outputToken).balanceOf(
-            address(this)
-        );
-        uint256 inputTokenBalance = IERC20(inputToken).balanceOf(address(this));
-        // TODO: Check math and make the math-code more readable / clear
-        uint256 numerator = inputAmount * inputTokenDepth * outputTokenBalance;
-        uint256 denominator = (inputAmount + inputTokenBalance) *
-            (inputAmount + inputTokenDepth);
-        outputAmount = numerator / denominator;
-        uint256 swapFee = (((outputAmount * outputAmount) * outputTokenDepth) /
-            (inputAmount + inputTokenDepth)) * (inputAmount + inputTokenDepth);
-        require(outputAmount > 0, "!Out3");
-        unchecked {
-            IERC20(inputToken).safeTransferFrom(
-                msg.sender,
-                address(this),
-                inputAmount
+        uint256 asset1Input = asset1TokenBal - asset1Depth;
+        uint256 asset2Input = asset2TokenBal - asset2Depth;
+        require(!(asset1Input > 0 && asset2Input > 0), "!BothInputs");
+        uint256 swapFee;
+
+        if (asset1Input > 0) {
+            outputAmount = _performSwap(
+                asset1Input,
+                asset1Depth,
+                asset2Depth,
+                asset2Addr
             );
-            IERC20(outputToken).safeTransfer(msg.sender, outputAmount);
+            swapFee = _getSwapFee(asset1Input, asset1Depth, asset2Depth);
+        } else {
+            outputAmount = _performSwap(
+                asset2Input,
+                asset2Depth,
+                asset1Depth,
+                asset1Addr
+            );
+            swapFee = _getSwapFee(asset2Input, asset2Depth, asset1Depth);
         }
 
-        emit Swap(inputToken, outputToken, inputAmount, outputAmount, swapFee);
+        _sync();
+        emit Swap(
+            asset1Input > 0 ? asset1Addr : asset2Addr,
+            asset1Input > 0 ? asset2Addr : asset1Addr,
+            asset1Input > 0 ? asset1Input : asset2Input,
+            outputAmount,
+            swapFee
+        );
     }
 
-    ////// TODO: Decide whether this is needed
-    // function sync() external onlyPROTOCOL {
-    //     _asset1Depth = iBEP20(asset1Addr).balanceOf(address(this));
-    //     _asset2Depth = iBEP20(asset2Addr).balanceOf(address(this));
-    // }
+    function _performSwap(
+        uint256 inputAmount,
+        uint256 inputDepth,
+        uint256 outputDepth,
+        address toAsset
+    ) internal returns (uint256) {
+        uint256 outputAmount = _getSwapOutput(
+            inputAmount,
+            inputDepth,
+            outputDepth
+        );
+        require(outputAmount > 0, "!Output");
+        unchecked {
+            IERC20(toAsset).safeTransfer(msg.sender, outputAmount);
+        }
+        return outputAmount;
+    }
+
+    function _squared(uint256 x) internal pure returns (uint256) {
+        // --- Readable Version ---
+        //// return x ** 2;
+
+        // --- Gas efficient version ---
+        return x * x;
+    }
+
+    function _getSwapOutput(
+        uint256 inputAmount,
+        uint256 inputDepth,
+        uint256 outputDepth
+    ) internal pure returns (uint256) {
+        // --- Readable Version ---
+        //// uint256 numerator = inputAmount * inputDepth * outputDepth;
+        //// uint256 denominator = _squared(inputAmount + inputDepth);
+        //// return numerator / denominator;
+
+        // --- Gas efficient version ---
+        return
+            (inputAmount * inputDepth * outputDepth) /
+            (_squared(inputAmount + inputDepth));
+    }
+
+    function _getSwapFee(
+        uint256 inputAmount,
+        uint256 inputDepth,
+        uint256 outputDepth
+    ) internal pure returns (uint256) {
+        // --- Readable Version ---
+        //// uint256 numerator = _squared(inputAmount) * outputDepth;
+        //// uint256 denominator = _squared(inputAmount + inputDepth);
+        //// return numerator / denominator;
+
+        // --- Gas efficient version ---
+        return
+            (_squared(inputAmount) * outputDepth) /
+            (_squared(inputAmount + inputDepth));
+    }
+
+    ////// TODO: Decide whether this is needed externally and if so, very carefully permission it
+    function _sync() internal {
+        _asset1Depth = IERC20(asset1Addr).balanceOf(address(this));
+        _asset2Depth = IERC20(asset2Addr).balanceOf(address(this));
+    }
 }

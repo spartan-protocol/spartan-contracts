@@ -63,12 +63,22 @@ contract Tools {
             // units = P * (numer / denom)
             // Make division last (solidity woes) adapts to:
             // units = (P * numer) / denom
+
+            // --- Readable Version ---
+            //// uint256 part1 = (token1Input * token2Depth) + (token2Input * token1Depth);
+            //// uint256 part2 = 2 * token1Input * token2Input;
+            //// uint256 denom = part1 + (2 * token1Depth * token2Depth);
+            //// require(denom > 0, "!DivBy0");
+            //// return (totalSupply * (part1 + part2)) / denom;
+
+            // --- Gas Efficient Version ---
             uint256 part1 = (token1Input * token2Depth) +
                 (token2Input * token1Depth);
-            uint256 part2 = 2 * token1Input * token2Input;
             uint256 denom = part1 + (2 * token1Depth * token2Depth);
             require(denom > 0, "!DivBy0");
-            return (totalSupply * (part1 + part2)) / denom;
+            return
+                (totalSupply * (part1 + (2 * token1Input * token2Input))) /
+                denom;
         }
     }
 
@@ -81,17 +91,20 @@ contract Tools {
         // slipAdjustment = (1 - ABS((B t - b T)/((2 b + B) (t + T))))
         uint256 numPart1 = token1Depth * token2Input;
         uint256 numPart2 = token2Depth * token1Input;
-        uint256 numerator;
-        if (numPart1 > numPart2) {
-            numerator = numPart1 - numPart2;
-        } else {
-            numerator = numPart2 - numPart1;
-        }
+        uint256 numerator = numPart1 > numPart2
+            ? numPart1 - numPart2
+            : numPart2 - numPart1;
 
-        uint256 denomPart1 = 2 * token1Input + token1Depth;
-        uint256 denomPart2 = token2Input + token2Depth;
-        uint256 denominator = denomPart1 * denomPart2;
+        // --- Readable Denominator Version ---
+        //// uint256 denomPart1 = 2 * token1Input + token1Depth;
+        //// uint256 denomPart2 = token2Input + token2Depth;
+        //// uint256 denominator = denomPart1 * denomPart2;
+
+        // --- Gas Efficient Denominator Version ---
+        uint256 denominator = (2 * token1Input + token1Depth) *
+            (token2Input + token2Depth);
         require(denominator > 0, "!Div0");
+
         return 1 ether - ((numerator * 1 ether) / denominator);
     }
 }

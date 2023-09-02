@@ -1,6 +1,14 @@
 import { expect } from "chai";
-import { oneHundred, oneMillion } from "./utils/utils";
+import {
+  getPoolAssetRatio,
+  getTokenBal,
+  oneHundred,
+  oneHundredThousand,
+  oneMillion,
+  oneThousand,
+} from "./utils/utils";
 import { createPoolsFixture } from "./0-Fixtures";
+import BigNumber from "bignumber.js";
 
 const {
   loadFixture,
@@ -121,7 +129,7 @@ describe("🏊‍♀️ Pool Contract", function () {
   });
 
   describe("() balances", function () {
-    it("Both calcLiqUnits formulas should return the same LP Units", async function () {
+    it("Both calcLiqUnits formulas should return the same LP Units for symmetrical adds", async function () {
       const {
         addr2,
         stablePoolAsAddr2,
@@ -137,36 +145,53 @@ describe("🏊‍♀️ Pool Contract", function () {
       await btcbAsAddr2.approve(nativePoolAsAddr2.target, oneMillion);
 
       // #1
+      const poolRatio1 = await getPoolAssetRatio(stablePoolAsAddr2);
       await busdAsAddr2.transfer(stablePoolAsAddr2.target, oneHundred);
       await usdtAsAddr2.transfer(stablePoolAsAddr2.target, oneHundred);
-      // StaticCall symmetrical addForMember()
-      // Cache returned LP units
+      // StaticCall symmetrical addForMember() --- Cache returned LP units
       const lpUnitsRecOld1 = await stablePoolAsAddr2.addForMember.staticCall(
         addr2
       );
-      console.log(lpUnitsRecOld1.toString());
-      // StaticCall symmetrical addForMemberNewTest()
-      // Cache returned LP units
+      // StaticCall symmetrical addForMemberNewTest() --- Cache returned LP units
       const lpUnitsRecNew1 =
         await stablePoolAsAddr2.addForMemberNewTest.staticCall(addr2);
-      console.log(lpUnitsRecNew1.toString());
       // Ensure the amounts are equal
       expect(lpUnitsRecOld1).to.equal(lpUnitsRecNew1);
-      // Write-txn symmetrical addForMemberNewTest()
+      // Write-txn symmetrical add
       await stablePoolAsAddr2.addForMemberNewTest(addr2);
 
       // #2
-      // Do some swaps to misbalance pools
+      // Do some swaps to change asset ratio in pool
+      await busdAsAddr2.transfer(stablePoolAsAddr2.target, oneThousand);
+      await stablePoolAsAddr2.swapToken();
+      const poolRatio2 = await getPoolAssetRatio(stablePoolAsAddr2);
 
       // #3
-      // StaticCall symmetrical addForMember()
-      // Cache returned LP units
-      // Write-txn symmetrical addForMemberNewTest()
-      // Cache returned LP units
+      await busdAsAddr2.transfer(stablePoolAsAddr2.target, oneHundred);
+      await usdtAsAddr2.transfer(
+        stablePoolAsAddr2.target,
+        BigNumber(oneHundred).times(poolRatio2).toString()
+      );
+      // StaticCall symmetrical addForMember() --- Cache returned LP units
+      const lpUnitsRecOld2 = await stablePoolAsAddr2.addForMember.staticCall(
+        addr2
+      );
+      // StaticCall symmetrical addForMemberNewTest() --- Cache returned LP units
+      const lpUnitsRecNew2 =
+        await stablePoolAsAddr2.addForMemberNewTest.staticCall(addr2);
       // Ensure the amounts are equal
+      expect(lpUnitsRecOld2).to.equal(lpUnitsRecNew2);
+      // Write-txn symmetrical add
+      await stablePoolAsAddr2.addForMemberNewTest(addr2);
 
       // #4
       // Do some swaps to re-balance pools to same rate as pre-#2
+      await usdtAsAddr2.transfer(
+        stablePoolAsAddr2.target,
+        BigNumber(oneThousand).times("0.99132").toString()
+      );
+      await stablePoolAsAddr2.swapToken();
+      const poolRatio3 = await getPoolAssetRatio(stablePoolAsAddr2);
 
       // #5
       // Write-txn removeLiquidity(LP units === #1 received)
@@ -197,6 +222,60 @@ describe("🏊‍♀️ Pool Contract", function () {
       // Write-txn removeLiquidity(LP units === #6 received)
       // Cache returned assets
       // Ensure the returned units are === units deposited in #6
+    });
+
+    it("Should get equal or less for asym add vs swap+add", async function () {
+      const {
+        addr2,
+        testHelpers,
+        stablePoolAsAddr2,
+        nativePoolAsAddr2,
+        busdAsAddr2,
+        usdtAsAddr2,
+        btcbAsAddr2,
+      } = await loadFixture(createPoolsFixture);
+
+      const testHelperAsAddr2 = testHelpers.connect(addr2);
+
+      // Get approvals
+      await busdAsAddr2.approve(stablePoolAsAddr2.target, oneMillion);
+      await usdtAsAddr2.approve(stablePoolAsAddr2.target, oneMillion);
+      await busdAsAddr2.approve(testHelpers.target, oneMillion);
+      await usdtAsAddr2.approve(testHelpers.target, oneMillion);
+
+      // #1 Cache staticCall result of asymAdd LP units
+      const token1Input = oneHundredThousand;
+      const qtrInput = BigNumber(token1Input).times("0.25").toString();
+      const halfInput = BigNumber(token1Input).times("0.5").toString();
+      const token2Input = "0";
+      const asymAddLps = await testHelperAsAddr2.addLiq.staticCall(
+        stablePoolAsAddr2.target,
+        token1Input,
+        token2Input
+      );
+
+      // #2 Swap half of asym-add to other asset then add roughly-Symmetrically
+      await busdAsAddr2.transfer(stablePoolAsAddr2.target, qtrInput);
+      const swapOutput1 = await stablePoolAsAddr2.swapToken.staticCall(); // cache swap1 result
+      await stablePoolAsAddr2.swapToken(); // perform swap
+      await busdAsAddr2.transfer(stablePoolAsAddr2.target, qtrInput);
+      const swapOutput2 = await stablePoolAsAddr2.swapToken.staticCall(); // cache swap2 result
+      await stablePoolAsAddr2.swapToken(); // perform swap
+      const totalSwapOutput = BigNumber(swapOutput1)
+        .plus(swapOutput2)
+        .toString();
+      // transfer both assets to pool
+      await busdAsAddr2.transfer(stablePoolAsAddr2.target, halfInput);
+      await usdtAsAddr2.transfer(stablePoolAsAddr2.target, totalSwapOutput);
+      const swapAddLps = await stablePoolAsAddr2.addForMemberNewTest.staticCall(
+        addr2
+      ); // cache add roughly ~symmetrically
+      await stablePoolAsAddr2.addForMemberNewTest(addr2); // perform add roughly ~symmetrically
+
+      // #3 Resulting LP units from #1 should be less-than or equal to #2
+      console.log("asymAddLps", asymAddLps);
+      console.log("swapAddLps", swapAddLps);
+      expect(asymAddLps).to.lessThanOrEqual(swapAddLps);
     });
 
     // it("Pool and user balances must change by correct amounts", async function () {

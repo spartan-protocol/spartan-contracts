@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import { Contract, Signer } from "ethers";
 import hre from "hardhat";
 
@@ -46,4 +47,11 @@ export const getTokenBal = async (
 ) => {
   const busdBalance = (await tokenContract.balanceOf(addrToCheck)).toString();
   return busdBalance;
+};
+
+// Get pool asset ratio
+export const getPoolAssetRatio = async (poolContract: Contract) => {
+  const { asset1Depth, asset2Depth } = await poolContract.getReserves(); // Get asset balances
+  const ratio = new BigNumber(asset1Depth).div(asset2Depth);
+  return ratio.toFixed(); // Get asset ratio
 };
