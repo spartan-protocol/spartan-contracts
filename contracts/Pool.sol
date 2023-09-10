@@ -96,7 +96,7 @@ contract Pool is ERC20, ReentrancyGuard {
         uint256 inputAsset1 = current1Balance - _asset1Depth;
         uint256 inputAsset2 = current2Balance - _asset2Depth;
 
-        require(inputAsset1 > 0 && inputAsset2 > 0, "!In1");
+        require(inputAsset1 > 0 && inputAsset2 > 0, "Input missing");
 
         uint _totalSupply = totalSupply();
         if (_totalSupply == 0) {
@@ -114,7 +114,7 @@ contract Pool is ERC20, ReentrancyGuard {
             ); // Calculate liquidity tokens to mint
         }
 
-        require(liquidity > 0, "!Liq1");
+        require(liquidity > 0, "LiqAdd too small");
 
         _mint(to, liquidity);
 
@@ -134,7 +134,7 @@ contract Pool is ERC20, ReentrancyGuard {
         uint256 inputAsset1 = current1Balance - _asset1Depth;
         uint256 inputAsset2 = current2Balance - _asset2Depth;
 
-        require(inputAsset1 > 0 || inputAsset2 > 0, "!In1");
+        require(inputAsset1 > 0 || inputAsset2 > 0, "Input missing");
 
         uint _totalSupply = totalSupply();
         if (_totalSupply == 0) {
@@ -153,7 +153,7 @@ contract Pool is ERC20, ReentrancyGuard {
                 ); // Calculate liquidity tokens to mint
         }
 
-        require(liquidity > 0, "!Liq1");
+        require(liquidity > 0, "LiqAdd too small");
 
         _mint(to, liquidity);
 
@@ -167,22 +167,25 @@ contract Pool is ERC20, ReentrancyGuard {
     function removeLiquidity(
         uint liquidity
     ) external nonReentrant returns (uint asset1Amount, uint asset2Amount) {
-        require(liquidity > 0, "!In2");
+        require(liquidity > 0, "Input LP units must be > 0");
         uint totalLiquidity = totalSupply();
-        require(totalLiquidity > 0, "!Liq2");
+        require(totalLiquidity > liquidity, "Not enough liquidity available");
         uint asset1Bal = IERC20(asset1Addr).balanceOf(address(this));
         uint asset2Bal = IERC20(asset2Addr).balanceOf(address(this));
-        // TODO: Check math and make the math-code more readable / clear
-        uint256 liquidityPercentage = (liquidity * (1e18)) / (totalLiquidity);
-        asset1Amount = (asset1Bal * (liquidityPercentage)) / (1e18);
-        asset2Amount = (asset2Bal * (liquidityPercentage)) / (1e18);
-        require(asset1Amount > 0 && asset2Amount > 0, "!Out2");
+        uint256 liquidityPercentage = (liquidity * (1 ether)) /
+            (totalLiquidity);
+        asset1Amount = (asset1Bal * (liquidityPercentage)) / (1 ether);
+        asset2Amount = (asset2Bal * (liquidityPercentage)) / (1 ether);
+        require(
+            asset1Amount > 0 && asset2Amount > 0,
+            "Insufficient assets withdrawn"
+        );
         _burn(msg.sender, liquidity);
-
         unchecked {
             IERC20(asset1Addr).safeTransfer(msg.sender, asset1Amount);
             IERC20(asset2Addr).safeTransfer(msg.sender, asset2Amount);
         }
+        _sync();
         emit Burn(msg.sender, asset1Amount, asset2Amount, liquidity);
     }
 
@@ -191,14 +194,17 @@ contract Pool is ERC20, ReentrancyGuard {
         address _asset2Addr = asset2Addr;
         uint256 asset1Depth = _asset1Depth;
         uint256 asset2Depth = _asset2Depth;
-        require(asset1Depth > 0 && asset2Depth > 0, "!Liq3");
+        require(asset1Depth > 0 && asset2Depth > 0, "Insufficient liquidity");
 
         uint256 asset1TokenBal = IERC20(_asset1Addr).balanceOf(address(this));
         uint256 asset2TokenBal = IERC20(_asset2Addr).balanceOf(address(this));
 
         uint256 asset1Input = asset1TokenBal - asset1Depth;
         uint256 asset2Input = asset2TokenBal - asset2Depth;
-        require(!(asset1Input > 0 && asset2Input > 0), "!BothInputs");
+        require(
+            !(asset1Input > 0 && asset2Input > 0),
+            "Two input assets detected"
+        ); // TODO: Decide if we want to allow this (LPs absorb the mistake)
         uint256 swapFee;
 
         if (asset1Input > 0) {
@@ -240,7 +246,7 @@ contract Pool is ERC20, ReentrancyGuard {
             inputDepth,
             outputDepth
         );
-        require(outputAmount > 0, "!Output");
+        require(outputAmount > 0, "Swap too small");
         unchecked {
             IERC20(toAsset).safeTransfer(msg.sender, outputAmount);
         }

@@ -25,25 +25,21 @@ contract Tools {
         uint256 token2Depth,
         uint256 totalSupply
     ) external pure returns (uint256 liquidityUnits) {
-        if (totalSupply == 0) {
-            return 10000; // If pool is empty; use 10000 as initial units
-        } else {
-            // units = ((P (t B + T b))/(2 T B)) * slipAdjustment
-            // P * (part1 + part2) / (part3) * slipAdjustment
-            uint256 slipAdjustment = getSlipAdjustment(
-                token1Input,
-                token1Depth,
-                token2Input,
-                token2Depth
-            );
-            require(slipAdjustment > (0.98 ether), "!Asym"); // Resist asym-adds
-            uint256 part1 = token1Input * token2Depth;
-            uint256 part2 = token2Input * token1Depth;
-            uint256 part3 = token2Depth * token1Depth * 2;
-            require(part3 > 0, "!DivBy0");
-            uint256 units = (totalSupply * (part1 + part2)) / (part3);
-            return (units * slipAdjustment) / 1 ether;
-        }
+        // units = ((P (t B + T b))/(2 T B)) * slipAdjustment
+        // P * (part1 + part2) / (part3) * slipAdjustment
+        uint256 slipAdjustment = getSlipAdjustment(
+            token1Input,
+            token1Depth,
+            token2Input,
+            token2Depth
+        );
+        require(slipAdjustment > (0.98 ether), "!Asym"); // Resist asym-adds
+        uint256 part1 = token1Input * token2Depth;
+        uint256 part2 = token2Input * token1Depth;
+        uint256 part3 = token2Depth * token1Depth * 2;
+        require(part3 > 0, "!DivBy0");
+        uint256 units = (totalSupply * (part1 + part2)) / (part3);
+        return (units * slipAdjustment) / 1 ether;
     }
 
     // TODO: Trying an adjusted calcUnits without need for slip adjustment hopefully
@@ -55,31 +51,27 @@ contract Tools {
         uint256 token2Depth,
         uint256 totalSupply
     ) external pure returns (uint256 liquidityUnits) {
-        if (totalSupply == 0) {
-            return 10000; // If pool is empty; use 10000 as initial units
-        } else {
-            // numer = tB + Tb + 2tb
-            // denom = tB + Tb + 2TB
-            // units = P * (numer / denom)
-            // Make division last (solidity woes) adapts to:
-            // units = (P * numer) / denom
+        // numer = tB + Tb + 2tb
+        // denom = tB + Tb + 2TB
+        // units = P * (numer / denom)
 
-            // --- Readable Version ---
-            //// uint256 part1 = (token1Input * token2Depth) + (token2Input * token1Depth);
-            //// uint256 part2 = 2 * token1Input * token2Input;
-            //// uint256 denom = part1 + (2 * token1Depth * token2Depth);
-            //// require(denom > 0, "!DivBy0");
-            //// return (totalSupply * (part1 + part2)) / denom;
+        // Make division last (solidity woes) adapts to:
+        // units = (P * numer) / denom
 
-            // --- Gas Efficient Version ---
-            uint256 part1 = (token1Input * token2Depth) +
-                (token2Input * token1Depth);
-            uint256 denom = part1 + (2 * token1Depth * token2Depth);
-            require(denom > 0, "!DivBy0");
-            return
-                (totalSupply * (part1 + (2 * token1Input * token2Input))) /
-                denom;
-        }
+        // --- Readable Version ---
+        //// uint256 part1 = (token1Input * token2Depth) + (token2Input * token1Depth);
+        //// uint256 part2 = 2 * token1Input * token2Input;
+        //// uint256 denom = part1 + (2 * token1Depth * token2Depth);
+        //// require(denom > 0, "!DivBy0");
+        //// return (totalSupply * (part1 + part2)) / denom;
+
+        // --- Gas Efficient Version ---
+        uint256 part1 = (token1Input * token2Depth) +
+            (token2Input * token1Depth);
+        uint256 denom = part1 + (2 * token1Depth * token2Depth);
+        require(denom > 0, "!DivBy0");
+        return
+            (totalSupply * (part1 + (2 * token1Input * token2Input))) / denom;
     }
 
     function getSlipAdjustment(

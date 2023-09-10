@@ -17,7 +17,7 @@ const {
 describe("🏊‍♀️ Pool Contract", function () {
   describe("addForMember() checks", function () {
     it("LiqAdd should fail if either input is !> 0", async function () {
-      // require(inputAsset1 > 0 && inputAsset2 > 0, "!In1");
+      // require(inputAsset1 > 0 && inputAsset2 > 0, "Input missing");
       const {
         addr2,
         stablePoolAsAddr2,
@@ -34,25 +34,25 @@ describe("🏊‍♀️ Pool Contract", function () {
 
       // Check stable pool
       await expect(stablePoolAsAddr2.addForMember(addr2)).to.be.revertedWith(
-        "!In1"
+        "Input missing"
       );
       await busdAsAddr2.transfer(stablePoolAsAddr2.target, oneHundred);
       await expect(stablePoolAsAddr2.addForMember(addr2)).to.be.revertedWith(
-        "!In1"
+        "Input missing"
       );
 
       // Check native pool
       await expect(nativePoolAsAddr2.addForMember(addr2)).to.be.revertedWith(
-        "!In1"
+        "Input missing"
       );
       await btcbAsAddr2.transfer(nativePoolAsAddr2.target, oneHundred);
       await expect(nativePoolAsAddr2.addForMember(addr2)).to.be.revertedWith(
-        "!In1"
+        "Input missing"
       );
     });
 
     it("LiqAdd should fail if resulting liq units !> 0", async function () {
-      // require(liquidity > 0, "!Liq1");
+      // require(liquidity > 0, "LiqAdd too small");
       const {
         addr2,
         stablePoolAsAddr2,
@@ -71,7 +71,7 @@ describe("🏊‍♀️ Pool Contract", function () {
       await busdAsAddr2.transfer(stablePoolAsAddr2.target, "1"); // (1 / 100000000000000000000000) = < 1 wei in LPs
       await usdtAsAddr2.transfer(stablePoolAsAddr2.target, "1"); // (1 / 100000000000000000000000) = < 1 wei in LPs
       await expect(stablePoolAsAddr2.addForMember(addr2)).to.be.revertedWith(
-        "!Liq1"
+        "LiqAdd too small"
       );
 
       // Hard to check native pool as the underflow is hard to reach without a larger TVL than we have available in sumlated whale wallets
