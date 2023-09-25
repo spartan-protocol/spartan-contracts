@@ -22,13 +22,13 @@ describe("🏊‍♀️ Pool Contract", function () {
         addr2,
         stablePoolAsAddr2,
         nativePoolAsAddr2,
-        busdAsAddr2,
+        usdcAsAddr2,
         usdtAsAddr2,
         btcbAsAddr2,
       } = await loadFixture(createPoolsFixture);
 
       // Get approvals
-      await busdAsAddr2.approve(stablePoolAsAddr2.target, oneMillion);
+      await usdcAsAddr2.approve(stablePoolAsAddr2.target, oneMillion);
       await usdtAsAddr2.approve(stablePoolAsAddr2.target, oneMillion);
       await btcbAsAddr2.approve(nativePoolAsAddr2.target, oneMillion);
 
@@ -36,7 +36,7 @@ describe("🏊‍♀️ Pool Contract", function () {
       await expect(stablePoolAsAddr2.addForMember(addr2)).to.be.revertedWith(
         "Input missing"
       );
-      await busdAsAddr2.transfer(stablePoolAsAddr2.target, oneHundred);
+      await usdcAsAddr2.transfer(stablePoolAsAddr2.target, oneHundred);
       await expect(stablePoolAsAddr2.addForMember(addr2)).to.be.revertedWith(
         "Input missing"
       );
@@ -57,18 +57,18 @@ describe("🏊‍♀️ Pool Contract", function () {
         addr2,
         stablePoolAsAddr2,
         nativePoolAsAddr2,
-        busdAsAddr2,
+        usdcAsAddr2,
         usdtAsAddr2,
         btcbAsAddr2,
       } = await loadFixture(createPoolsFixture);
 
       // Get approvals
-      await busdAsAddr2.approve(stablePoolAsAddr2.target, oneMillion);
+      await usdcAsAddr2.approve(stablePoolAsAddr2.target, oneMillion);
       await usdtAsAddr2.approve(stablePoolAsAddr2.target, oneMillion);
       await btcbAsAddr2.approve(nativePoolAsAddr2.target, oneMillion);
 
       // Check stable pool (1 wei vs 100k ether is the friction point for this test)
-      await busdAsAddr2.transfer(stablePoolAsAddr2.target, "1"); // (1 / 100000000000000000000000) = < 1 wei in LPs
+      await usdcAsAddr2.transfer(stablePoolAsAddr2.target, "1"); // (1 / 100000000000000000000000) = < 1 wei in LPs
       await usdtAsAddr2.transfer(stablePoolAsAddr2.target, "1"); // (1 / 100000000000000000000000) = < 1 wei in LPs
       await expect(stablePoolAsAddr2.addForMember(addr2)).to.be.revertedWith(
         "LiqAdd too small"
@@ -82,7 +82,7 @@ describe("🏊‍♀️ Pool Contract", function () {
     //   await expect(
     //     poolFactory
     //       .connect(addr1)
-    //       .createPool(oneThousand, oneHundred, busdAddr, busdAddr)
+    //       .createPool(oneThousand, oneHundred, usdcAddr, usdcAddr)
     //   ).to.be.revertedWith("!Valid");
     //   await expect(
     //     poolFactory
@@ -134,19 +134,19 @@ describe("🏊‍♀️ Pool Contract", function () {
         addr2,
         stablePoolAsAddr2,
         nativePoolAsAddr2,
-        busdAsAddr2,
+        usdcAsAddr2,
         usdtAsAddr2,
         btcbAsAddr2,
       } = await loadFixture(createPoolsFixture);
 
       // Get approvals
-      await busdAsAddr2.approve(stablePoolAsAddr2.target, oneMillion);
+      await usdcAsAddr2.approve(stablePoolAsAddr2.target, oneMillion);
       await usdtAsAddr2.approve(stablePoolAsAddr2.target, oneMillion);
       await btcbAsAddr2.approve(nativePoolAsAddr2.target, oneMillion);
 
       // #1
       const poolRatio1 = await getPoolAssetRatio(stablePoolAsAddr2);
-      await busdAsAddr2.transfer(stablePoolAsAddr2.target, oneHundred);
+      await usdcAsAddr2.transfer(stablePoolAsAddr2.target, oneHundred);
       await usdtAsAddr2.transfer(stablePoolAsAddr2.target, oneHundred);
       // StaticCall symmetrical addForMember() --- Cache returned LP units
       const lpUnitsRecOld1 = await stablePoolAsAddr2.addForMember.staticCall(
@@ -162,12 +162,12 @@ describe("🏊‍♀️ Pool Contract", function () {
 
       // #2
       // Do some swaps to change asset ratio in pool
-      await busdAsAddr2.transfer(stablePoolAsAddr2.target, oneThousand);
+      await usdcAsAddr2.transfer(stablePoolAsAddr2.target, oneThousand);
       await stablePoolAsAddr2.swapToken();
       const poolRatio2 = await getPoolAssetRatio(stablePoolAsAddr2);
 
       // #3
-      await busdAsAddr2.transfer(stablePoolAsAddr2.target, oneHundred);
+      await usdcAsAddr2.transfer(stablePoolAsAddr2.target, oneHundred);
       await usdtAsAddr2.transfer(
         stablePoolAsAddr2.target,
         BigNumber(oneHundred).times(poolRatio2).toString()
@@ -230,7 +230,7 @@ describe("🏊‍♀️ Pool Contract", function () {
         testHelpers,
         stablePoolAsAddr2,
         nativePoolAsAddr2,
-        busdAsAddr2,
+        usdcAsAddr2,
         usdtAsAddr2,
         btcbAsAddr2,
       } = await loadFixture(createPoolsFixture);
@@ -238,9 +238,9 @@ describe("🏊‍♀️ Pool Contract", function () {
       const testHelperAsAddr2 = testHelpers.connect(addr2);
 
       // Get approvals
-      await busdAsAddr2.approve(stablePoolAsAddr2.target, oneMillion);
+      await usdcAsAddr2.approve(stablePoolAsAddr2.target, oneMillion);
       await usdtAsAddr2.approve(stablePoolAsAddr2.target, oneMillion);
-      await busdAsAddr2.approve(testHelpers.target, oneMillion);
+      await usdcAsAddr2.approve(testHelpers.target, oneMillion);
       await usdtAsAddr2.approve(testHelpers.target, oneMillion);
 
       // #1 Cache staticCall result of asymAdd LP units
@@ -255,17 +255,17 @@ describe("🏊‍♀️ Pool Contract", function () {
       );
 
       // #2 Swap half of asym-add to other asset then add roughly-Symmetrically
-      await busdAsAddr2.transfer(stablePoolAsAddr2.target, qtrInput);
+      await usdcAsAddr2.transfer(stablePoolAsAddr2.target, qtrInput);
       const swapOutput1 = await stablePoolAsAddr2.swapToken.staticCall(); // cache swap1 result
       await stablePoolAsAddr2.swapToken(); // perform swap
-      await busdAsAddr2.transfer(stablePoolAsAddr2.target, qtrInput);
+      await usdcAsAddr2.transfer(stablePoolAsAddr2.target, qtrInput);
       const swapOutput2 = await stablePoolAsAddr2.swapToken.staticCall(); // cache swap2 result
       await stablePoolAsAddr2.swapToken(); // perform swap
       const totalSwapOutput = BigNumber(swapOutput1)
         .plus(swapOutput2)
         .toString();
       // transfer both assets to pool
-      await busdAsAddr2.transfer(stablePoolAsAddr2.target, halfInput);
+      await usdcAsAddr2.transfer(stablePoolAsAddr2.target, halfInput);
       await usdtAsAddr2.transfer(stablePoolAsAddr2.target, totalSwapOutput);
       const swapAddLps = await stablePoolAsAddr2.addForMemberNewTest.staticCall(
         addr2
@@ -281,37 +281,37 @@ describe("🏊‍♀️ Pool Contract", function () {
     // it("Pool and user balances must change by correct amounts", async function () {
     //   const {
     //     addr1,
-    //     busdAsAddr1,
+    //     usdcAsAddr1,
     //     usdtAsAddr1,
     //     btcbAsAddr1,
     //     stablePoolAddr,
     //     nativePoolAddr,
     //   } = await loadFixture(createPoolsFixture);
     //   // Get user balances after txn
-    //   const addr1BusdBal = await getTokenBal(busdAsAddr1, addr1);
+    //   const addr1usdcBal = await getTokenBal(usdcAsAddr1, addr1);
     //   const addr1UsdtBal = await getTokenBal(usdtAsAddr1, addr1);
     //   // TODO: Add 'get' BNB addr1 balance
     //   const addr1BtcbBal = await getTokenBal(btcbAsAddr1, addr1);
     //   // Get pool balances after txn
-    //   const poolBusdBal = await getTokenBal(busdAsAddr1, stablePoolAddr);
+    //   const poolusdcBal = await getTokenBal(usdcAsAddr1, stablePoolAddr);
     //   const poolUsdtBal = await getTokenBal(usdtAsAddr1, stablePoolAddr);
     //   // TODO: Add 'get' BNB Pool balance
     //   const poolBtcbBal = await getTokenBal(btcbAsAddr1, nativePoolAddr);
     //   // Expected user & pool balances after txn
-    //   const addr1BusdExp =
+    //   const addr1usdcExp =
     //     BigNumber(startBalanceStables).minus(stablePoolInput1);
     //   const addr1UsdtExp =
     //     BigNumber(startBalanceStables).minus(stablePoolInput2);
     //   // TODO: Add BNB balance change expectations
     //   const addr1BtcbExp = BigNumber(startBalanceBtc).minus(nativePoolInput2);
-    //   // console.log("DEBUG:", addr1BusdBal, addr1BusdExp.toFixed(0));
+    //   // console.log("DEBUG:", addr1usdcBal, addr1usdcExp.toFixed(0));
     //   // Run addr1 balance checks
-    //   expect(addr1BusdBal).to.equal(addr1BusdExp.toFixed(0));
+    //   expect(addr1usdcBal).to.equal(addr1usdcExp.toFixed(0));
     //   expect(addr1UsdtBal).to.equal(addr1UsdtExp.toFixed(0));
     //   // TODO: Add BNB addr1 balance change expectations
     //   expect(addr1BtcbBal).to.equal(addr1BtcbExp.toFixed(0));
     //   // Run pool balance checks
-    //   expect(poolBusdBal).to.equal(stablePoolInput1);
+    //   expect(poolusdcBal).to.equal(stablePoolInput1);
     //   expect(poolUsdtBal).to.equal(stablePoolInput2);
     //   // TODO: Add BNB pool balance change expectations
     //   expect(poolBtcbBal).to.equal(nativePoolInput2);
@@ -376,9 +376,9 @@ describe("🏊‍♀️ Pool Contract", function () {
 
   describe("() events", function () {
     // it("Should emit PoolCreated event", async function () {
-    //   const { poolFactory, addr1, busdAsAddr1, usdtAsAddr1, btcbAsAddr1 } =
+    //   const { poolFactory, addr1, usdcAsAddr1, usdtAsAddr1, btcbAsAddr1 } =
     //     await loadFixture(deployFixture);
-    //   await busdAsAddr1.approve(poolFactory.target, oneMillion);
+    //   await usdcAsAddr1.approve(poolFactory.target, oneMillion);
     //   await usdtAsAddr1.approve(poolFactory.target, oneMillion);
     //   await btcbAsAddr1.approve(poolFactory.target, oneMillion);
     //   let _token1Addr = stablePoolToken1;

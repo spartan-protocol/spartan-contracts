@@ -4,7 +4,7 @@ import hre from "hardhat";
 
 // Token Addresses
 export const zeroAddr = "0x0000000000000000000000000000000000000000"; // Zero Address
-export const busdAddr = "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56"; // BUSD BEP20 Address on BSC Mainnet
+export const usdcAddr = "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d"; // usdc BEP20 Address on BSC Mainnet
 export const usdtAddr = "0x55d398326f99059fF775485246999027B3197955"; // USDT BEP20 Address on BSC Mainnet
 export const btcbAddr = "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c"; // BTCB BEP20 Address on BSC Mainnet
 export const wbnbAddr = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"; // WBNB BEP20 Address on BSC Mainnet
@@ -45,8 +45,8 @@ export const getTokenBal = async (
   tokenContract: Contract,
   addrToCheck: string
 ) => {
-  const busdBalance = (await tokenContract.balanceOf(addrToCheck)).toString();
-  return busdBalance;
+  const usdcBalance = (await tokenContract.balanceOf(addrToCheck)).toString();
+  return usdcBalance;
 };
 
 // Get pool asset ratio

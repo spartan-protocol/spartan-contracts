@@ -2,7 +2,7 @@ import hre from "hardhat";
 import {
   bnbCexHW6,
   btcbAddr,
-  busdAddr,
+  usdcAddr,
   connectToContract,
   oneMillion,
   spartaAddr,
@@ -39,16 +39,16 @@ export const deployFixture = async () => {
     params: [bnbCexHW6],
   });
 
-  /* Impersonate a whale to gain BUSD balances in the test accounts */
+  /* Impersonate a whale to gain usdc balances in the test accounts */
   const bnbCexSigner = await hre.ethers.provider.getSigner(bnbCexHW6);
-  const _busdAsBnbCex = await hre.ethers.getContractAt(
+  const _usdcAsBnbCex = await hre.ethers.getContractAt(
     "ERC20",
-    busdAddr,
+    usdcAddr,
     bnbCexSigner
-  ); // Get BUSD contract
-  const busdAsBnbCex = _busdAsBnbCex.connect(bnbCexSigner); // Get BUSD contract with BinanceCex signer
-  await busdAsBnbCex.transfer(addr1.address, startBalanceStables); // Give addr1 initial BUSD balance
-  await busdAsBnbCex.transfer(addr2.address, startBalanceStables); // Give addr2 initial BUSD balance
+  ); // Get usdc contract
+  const usdcAsBnbCex = _usdcAsBnbCex.connect(bnbCexSigner); // Get usdc contract with BinanceCex signer
+  await usdcAsBnbCex.transfer(addr1.address, startBalanceStables); // Give addr1 initial usdc balance
+  await usdcAsBnbCex.transfer(addr2.address, startBalanceStables); // Give addr2 initial usdc balance
 
   /* Impersonate a whale to gain USDT balances in the test accounts */
   const _usdtAsBnbCex = await hre.ethers.getContractAt(
@@ -110,10 +110,10 @@ export const deployFixture = async () => {
   await protocolToken.changeHandler(handler.target);
 
   /* Get token contract objects */
-  const busdAsAddr1 = await connectToContract("ERC20", busdAddr, addr1); // Get BUSD contract object with addr1 signer
+  const usdcAsAddr1 = await connectToContract("ERC20", usdcAddr, addr1); // Get usdc contract object with addr1 signer
   const usdtAsAddr1 = await connectToContract("ERC20", usdtAddr, addr1); // Get USDT contract object with addr1 signer
   const btcbAsAddr1 = await connectToContract("ERC20", btcbAddr, addr1); // Get BTCB contract object with addr1 signer
-  const busdAsAddr2 = await connectToContract("ERC20", busdAddr, addr2); // Get BUSD contract object with addr1 signer
+  const usdcAsAddr2 = await connectToContract("ERC20", usdcAddr, addr2); // Get usdc contract object with addr1 signer
   const usdtAsAddr2 = await connectToContract("ERC20", usdtAddr, addr2); // Get USDT contract object with addr1 signer
   const btcbAsAddr2 = await connectToContract("ERC20", btcbAddr, addr2); // Get BTCB contract object with addr1 signer
 
@@ -122,7 +122,7 @@ export const deployFixture = async () => {
   //   "NAME",
   //   "SYMBOL",
   //   protocolToken.target,
-  //   busdAddr,
+  //   usdcAddr,
   //   wbnbAddr,
   // ]);
 
@@ -132,10 +132,10 @@ export const deployFixture = async () => {
     owner,
     addr1,
     addr2,
-    busdAsAddr1,
+    usdcAsAddr1,
     usdtAsAddr1,
     btcbAsAddr1,
-    busdAsAddr2,
+    usdcAsAddr2,
     usdtAsAddr2,
     btcbAsAddr2,
     protocolToken,
@@ -149,17 +149,17 @@ export const createPoolsFixture = async () => {
     owner,
     addr1,
     addr2,
-    busdAsAddr1,
+    usdcAsAddr1,
     usdtAsAddr1,
     btcbAsAddr1,
-    busdAsAddr2,
+    usdcAsAddr2,
     usdtAsAddr2,
     btcbAsAddr2,
     protocolToken,
   } = await loadFixture(deployFixture);
 
   /* Deploy Contracts */
-  await busdAsAddr1.approve(poolFactory.target, oneMillion);
+  await usdcAsAddr1.approve(poolFactory.target, oneMillion);
   await usdtAsAddr1.approve(poolFactory.target, oneMillion);
   await poolFactory
     .connect(addr1)
@@ -215,10 +215,10 @@ export const createPoolsFixture = async () => {
     owner,
     addr1,
     addr2,
-    busdAsAddr1,
+    usdcAsAddr1,
     usdtAsAddr1,
     btcbAsAddr1,
-    busdAsAddr2,
+    usdcAsAddr2,
     usdtAsAddr2,
     btcbAsAddr2,
     stablePoolAddr,
